@@ -284,6 +284,8 @@ struct SizeComputationInput {
     // line with the ellipsis flag and clear it.
     // This flag is not inherited into descendant ReflowInputs.
     bool mApplyLineClamp : 1;
+
+    bool mBResizeForPercentages : 1;
   };
 
 #ifdef DEBUG
