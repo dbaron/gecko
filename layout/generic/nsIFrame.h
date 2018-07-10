@@ -600,6 +600,7 @@ class nsIFrame : public nsQueryFrame {
         mMayHaveTransformAnimation(false),
         mMayHaveOpacityAnimation(false),
         mAllDescendantsAreInvisible(false),
+        mHasBSizeChange(false),
         mInScrollAnchorChain(false) {
     MOZ_ASSERT(mComputedStyle);
     MOZ_ASSERT(mPresContext);
@@ -4182,6 +4183,9 @@ class nsIFrame : public nsQueryFrame {
     mMayHaveWillChangeBudget = aHasBudget;
   }
 
+  bool HasBSizeChange() const { return mHasBSizeChange; }
+  void SetHasBSizeChange(bool aHasBSizeChange) { mHasBSizeChange = aHasBSizeChange; }
+
   /**
    * Returns the hit test area of the frame.
    */
@@ -4400,6 +4404,8 @@ class nsIFrame : public nsQueryFrame {
    * child. This flag is stil false in such case.
    */
   bool mAllDescendantsAreInvisible : 1;
+
+  bool mHasBSizeChange : 1;
 
   /**
    * True if we are or contain the scroll anchor for a scrollable frame.
