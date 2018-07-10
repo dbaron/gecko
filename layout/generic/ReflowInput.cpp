@@ -77,6 +77,8 @@ ReflowInput::ReflowInput(nsPresContext* aPresContext, nsIFrame* aFrame,
   AvailableBSize() = aAvailableSpace.BSize(mWritingMode);
   mFloatManager = nullptr;
   mLineLayout = nullptr;
+  mFlags.mBResizeForPercentages = false;
+
   mDiscoveredClearance = nullptr;
   mPercentBSizeObserver = nullptr;
 
@@ -551,6 +553,7 @@ void ReflowInput::InitResizeFlags(nsPresContext* aPresContext,
                                   LayoutFrameType aFrameType) {
   SetBResize(false);
   SetIResize(false);
+  mFlags.mBResizeForPercentages = false;
 
   const WritingMode wm = mWritingMode;  // just a shorthand
   // We should report that we have a resize in the inline dimension if
@@ -681,35 +684,32 @@ void ReflowInput::InitResizeFlags(nsPresContext* aPresContext,
     // mCBReflowInput->IsBResize() is set correctly below when
     // reflowing descendant.
     SetBResize(true);
+    // set new resize flag on reflow
+    mFlags.mBResizeForPercentages = true;
   } else if (mCBReflowInput && mFrame->IsBlockWrapper()) {
     // XXX Is this problematic for relatively positioned inlines acting
     // as containing block for absolutely positioned elements?
     // Possibly; in that case we should at least be checking
     // NS_SUBTREE_DIRTY, I'd think.
     SetBResize(mCBReflowInput->IsBResizeForWM(wm));
-  } else if (mCBReflowInput && !mFrame->IsBlockFrameOrSubclass()) {
-    // Some non-block frames (e.g. table frames) aggressively optimize out their
-    // BSize recomputation when they don't have the BResize flag set.  This
-    // means that if they go from having a computed non-auto height to having an
-    // auto height and don't have that flag set, they will not actually compute
-    // their auto height and will just remain at whatever size they already
-    // were.  We can end up in that situation if the child has a percentage
-    // specified height and the parent changes from non-auto height to auto
-    // height.  When that happens, the parent will typically have the BResize
-    // flag set, and we want to propagate that flag to the kid.
-    //
-    // Ideally it seems like we'd do this for blocks too, of course... but we'd
-    // really want to restrict it to the percentage height case or something, to
-    // avoid extra reflows in common cases.  Maybe we should be examining
-    // mStylePosition->BSize(wm).GetUnit() for that purpose?
-    //
-    // Note that we _also_ need to set the BResize flag if we have auto
-    // ComputedBSize() and a dirty subtree, since that might require us to
-    // change BSize due to kids having been added or removed.
-    SetBResize(mCBReflowInput->IsBResizeForWM(wm));
-    if (ComputedBSize() == NS_AUTOHEIGHT) {
-      SetBResize(IsBResize() || NS_SUBTREE_DIRTY(mFrame));
-    }
+    // set new resize flag on reflow
+    mFlags.mBResizeForPercentages = true;
+
+  } else if (mCBReflowInput &&
+             (!wm.IsOrthogonalTo(mCBReflowInput->mWritingMode)
+                // look at new flag instead
+                // Note: this is uset below, so won't fire when we recurse into sub frames!
+                // ? mCBReflowInput->mFrame->HasBSizeChange()
+                // Note: This causes perf regression on F52 test case, but fixes
+                // correctness issue in bug1351924.html
+                // Need to make a reftest out of bug1351924.html
+                ? mCBReflowInput->mFlags.mBResizeForPercentages
+                : mCBReflowInput->IsIResize()) &&
+             mStylePosition->BSize(wm).ConvertsToPercentage()) {
+    SetBResize(true);
+    // set new resize flag on reflow
+    mFlags.mBResizeForPercentages = true;
+    // "bresize for percentages"
   } else if (ComputedBSize() == NS_AUTOHEIGHT) {
     if (eCompatibility_NavQuirks == aPresContext->CompatibilityMode() &&
         mCBReflowInput) {
@@ -719,9 +719,24 @@ void ReflowInput::InitResizeFlags(nsPresContext* aPresContext,
     }
     SetBResize(IsBResize() || NS_SUBTREE_DIRTY(mFrame));
   } else {
+    // "The size is actually different"
     // not 'auto' block-size
     SetBResize(mFrame->BSize(wm) !=
-               ComputedBSize() + ComputedLogicalBorderPadding().BStartEnd(wm));
+              ComputedBSize() + ComputedLogicalBorderPadding().BStartEnd(wm));
+  }
+
+  // When we have an nsChangeHint_UpdateComputedBSize, we'll set a bit on the frame
+  // to indicate we're resizing. Here we note that, and propagate it forward for
+  // cases where we have children with percentage sizes, as those will need to resize
+  // too and may not have the appropriate bits set for themselves.
+  // In particular we need to propagate across a display type boundary.
+  // Also tricky case is switching from an auto to a non-auto size with percent
+  // children, as percent sizes inherit auto if the parent is auto.
+  if (mFrame->HasBSizeChange()) {
+    SetBResize(true);
+    // set new resize flag on reflow
+    mFlags.mBResizeForPercentages = true;
+    mFrame->SetHasBSizeChange(false); // uncommenting this breaks test case.
   }
 
   bool dependsOnCBBSize =

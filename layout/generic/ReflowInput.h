@@ -269,6 +269,8 @@ struct SizeComputationInput {
     // with when we set & react to these bits.
     bool mIOffsetsNeedCSSAlign : 1;
     bool mBOffsetsNeedCSSAlign : 1;
+
+    bool mBResizeForPercentages : 1;
   };
 
 #ifdef DEBUG
