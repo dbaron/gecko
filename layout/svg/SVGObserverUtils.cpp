@@ -628,6 +628,25 @@ SVGObserverUtils::GetMarkerFrames(nsIFrame* aMarkedFrame,
   return foundMarker;
 }
 
+already_AddRefed<URLAndReferrerInfo>
+SVGObserverUtils::HrefToURL(nsIContent* aContent, const nsString& aHref)
+{
+  nsCOMPtr<nsIURI> targetURI;
+  nsCOMPtr<nsIURI> base = aContent->GetBaseURI();
+  nsContentUtils::NewURIWithDocumentCharset(getter_AddRefs(targetURI), aHref,
+                                            aContent->GetUncomposedDoc(), base);
+  nsIDocument* doc = aContent->OwnerDoc();
+
+  // There's no clear referrer policy spec about non-CSS SVG resource references
+  // Bug 1415044 to investigate which referrer we should use
+  RefPtr<URLAndReferrerInfo> target =
+    new URLAndReferrerInfo(targetURI,
+                           doc->GetDocumentURI(),
+                           doc->GetReferrerPolicy());
+
+  return target.forget();
+}
+
 SVGGeometryElement*
 SVGObserverUtils::GetTextPathsReferencedPath(nsIFrame* aTextPathFrame)
 {
@@ -642,17 +661,7 @@ SVGObserverUtils::GetTextPathsReferencedPath(nsIFrame* aTextPathFrame)
       return nullptr; // no URL
     }
 
-    nsCOMPtr<nsIURI> targetURI;
-    nsCOMPtr<nsIURI> base = content->GetBaseURI();
-    nsContentUtils::NewURIWithDocumentCharset(getter_AddRefs(targetURI), href,
-                                              content->GetUncomposedDoc(), base);
-
-    // There's no clear refererer policy spec about non-CSS SVG resource references
-    // Bug 1415044 to investigate which referrer we should use
-    RefPtr<URLAndReferrerInfo> target =
-      new URLAndReferrerInfo(targetURI,
-                             content->OwnerDoc()->GetDocumentURI(),
-                             content->OwnerDoc()->GetReferrerPolicy());
+    RefPtr<URLAndReferrerInfo> target = HrefToURL(content, href);
 
     property = GetEffectProperty(target, aTextPathFrame,
                                  HrefAsTextPathProperty());
