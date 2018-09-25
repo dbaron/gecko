@@ -50,27 +50,24 @@ namespace mozilla {
 class URLAndReferrerInfo
 {
 public:
-  URLAndReferrerInfo(nsIURI* aURI, nsIURI* aReferrer,
-                     mozilla::net::ReferrerPolicy aReferrerPolicy)
-    : mURI(aURI)
-    , mReferrer(aReferrer)
-    , mReferrerPolicy(aReferrerPolicy)
- {
-   MOZ_ASSERT(aURI);
- }
+  URLAndReferrerInfo(already_AddRefed<nsIURI> aURI,
+                     already_AddRefed<URLExtraData> aExtraData)
+    : mURI(std::move(aURI))
+    , mExtraData(std::move(aExtraData))
+  {
+    MOZ_ASSERT(mURI);
+  }
 
   NS_INLINE_DECL_REFCOUNTING(URLAndReferrerInfo)
 
-  nsIURI* GetURI() { return mURI; }
-  nsIURI* GetReferrer() { return mReferrer; }
-  mozilla::net::ReferrerPolicy GetReferrerPolicy() { return mReferrerPolicy; }
+  nsIURI* URI() { return mURI; }
+  URLExtraData* ExtraData() { return mExtraData; }
 
 private:
   ~URLAndReferrerInfo() = default;
 
   nsCOMPtr<nsIURI> mURI;
-  nsCOMPtr<nsIURI> mReferrer;
-  mozilla::net::ReferrerPolicy mReferrerPolicy;
+  RefPtr<URLExtraData> mExtraData;
 };
 
 /*

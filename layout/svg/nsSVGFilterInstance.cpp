@@ -130,10 +130,10 @@ nsSVGFilterInstance::GetFilterFrame(nsIFrame* aTargetFrame)
   // aTargetFrame can be null if this filter belongs to a
   // CanvasRenderingContext2D.
   nsCOMPtr<nsIURI> url;
-  if(aTargetFrame) {
+  if (aTargetFrame) {
     RefPtr<URLAndReferrerInfo> urlExtraReferrer =
       SVGObserverUtils::GetFilterURI(aTargetFrame, mFilter);
-    url = urlExtraReferrer->GetURI();
+    url = urlExtraReferrer->URI();
   } else {
     url = mFilter.GetURL()->ResolveLocalRef(mTargetContent);
   }

@@ -183,9 +183,10 @@ SVGIDRenderingObserver::SVGIDRenderingObserver(URLAndReferrerInfo* aURI,
   nsCOMPtr<nsIURI> referrer;
   uint32_t referrerPolicy = mozilla::net::RP_Unset;
   if (aURI) {
-    uri = aURI->GetURI();
-    referrer = aURI->GetReferrer();
-    referrerPolicy = aURI->GetReferrerPolicy();
+    uri = aURI->URI();
+    URLExtraData* extraData = aURI->ExtraData();
+    referrer = extraData->GetReferrer();
+    referrerPolicy = extraData->GetReferrerPolicy();
   }
 
   mObservedElementTracker.Reset(aObservingContent, uri, referrer,
@@ -339,9 +340,8 @@ SVGFilterObserverList::SVGFilterObserverList(const nsTArray<nsStyleFilter>& aFil
         aFilters[i].GetURL()->ResolveLocalRef(aFilteredElement);
       if (resolvedURI) {
         filterURL = new URLAndReferrerInfo(
-          resolvedURI,
-          aFilters[i].GetURL()->mExtraData->GetReferrer(),
-          aFilters[i].GetURL()->mExtraData->GetReferrerPolicy());
+          resolvedURI.forget(),
+          do_AddRef(aFilters[i].GetURL()->mExtraData));
       }
     }
 
@@ -440,7 +440,7 @@ SVGMaskObserverList::SVGMaskObserverList(nsIFrame* aFrame)
       SVGObserverUtils::GetMaskURI(aFrame, i);
     bool hasRef = false;
     if (maskUri) {
-      maskUri->GetURI()->GetHasRef(&hasRef);
+      maskUri->URI()->GetHasRef(&hasRef);
     }
 
     // Accrording to maskUri, nsSVGPaintingProperty's ctor may trigger an
@@ -639,10 +639,11 @@ SVGObserverUtils::HrefToURL(nsIContent* aContent, const nsString& aHref)
 
   // There's no clear referrer policy spec about non-CSS SVG resource references
   // Bug 1415044 to investigate which referrer we should use
+  RefPtr<URLExtraData> extraData =
+    new URLExtraData(base.forget(), doc->GetDocumentURI(),
+                     aContent->NodePrincipal(), doc->GetReferrerPolicy());
   RefPtr<URLAndReferrerInfo> target =
-    new URLAndReferrerInfo(targetURI,
-                           doc->GetDocumentURI(),
-                           doc->GetReferrerPolicy());
+    new URLAndReferrerInfo(targetURI.forget(), extraData.forget());
 
   return target.forget();
 }
@@ -1138,9 +1139,7 @@ ResolveURLUsingLocalRef(nsIFrame* aFrame, const css::URLValueData* aURL)
     if (!uri) {
       return nullptr;
     }
-    result = new URLAndReferrerInfo(uri,
-                                    aURL->mExtraData->GetReferrer(),
-                                    aURL->mExtraData->GetReferrerPolicy());
+    result = new URLAndReferrerInfo(uri.forget(), do_AddRef(aURL->mExtraData));
     return result.forget();
   }
 
@@ -1152,9 +1151,13 @@ ResolveURLUsingLocalRef(nsIFrame* aFrame, const css::URLValueData* aURL)
     return nullptr;
   }
 
-  result = new URLAndReferrerInfo(resolvedURI,
-                                  aURL->mExtraData->GetReferrer(),
-                                  aURL->mExtraData->GetReferrerPolicy());
+  URLExtraData *oldExtraData = aURL->mExtraData;
+  RefPtr<URLExtraData> newExtraData =
+    new URLExtraData(baseURI.forget(), do_AddRef(oldExtraData->GetReferrer()),
+                     do_AddRef(oldExtraData->GetPrincipal()),
+                     oldExtraData->GetReferrerPolicy());
+
+  result = new URLAndReferrerInfo(resolvedURI.forget(), newExtraData.forget());
   return result.forget();
 }
 
