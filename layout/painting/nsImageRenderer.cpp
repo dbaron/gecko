@@ -173,16 +173,20 @@ nsImageRenderer::PrepareImage()
       nsAutoString elementId =
         NS_LITERAL_STRING("#") + nsDependentAtomString(mImage->GetElementId());
       nsCOMPtr<nsIURI> targetURI;
-      nsCOMPtr<nsIURI> base = mForFrame->GetContent()->GetBaseURI();
+      nsIContent* content = mForFrame->GetContent();
+      nsCOMPtr<nsIURI> base = content->GetBaseURI();
       nsContentUtils::NewURIWithDocumentCharset(
         getter_AddRefs(targetURI),
         elementId,
-        mForFrame->GetContent()->GetUncomposedDoc(),
+        content->GetUncomposedDoc(),
         base);
-      RefPtr<URLAndReferrerInfo> url = new URLAndReferrerInfo(
-        targetURI,
-        mForFrame->GetContent()->OwnerDoc()->GetDocumentURI(),
-        mForFrame->GetContent()->OwnerDoc()->GetReferrerPolicy());
+      nsIDocument* ownerDoc = content->OwnerDoc();
+      RefPtr<URLExtraData> extraData =
+        new URLExtraData(base.forget(), do_AddRef(ownerDoc->GetDocumentURI()),
+                         do_AddRef(content->NodePrincipal()),
+                         ownerDoc->GetReferrerPolicy());
+      RefPtr<URLAndReferrerInfo> url =
+        new URLAndReferrerInfo(targetURI.forget(), extraData.forget());
 
       nsSVGPaintingProperty* property = SVGObserverUtils::GetPaintingPropertyForURI(
           url, mForFrame->FirstContinuation(),
