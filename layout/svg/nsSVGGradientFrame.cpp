@@ -364,7 +364,8 @@ nsSVGGradientFrame::GetReferencedGradient()
       return nullptr; // no URL
     }
 
-    RefPtr<URLAndReferrerInfo> target = HrefToURI(mContent, href);
+    RefPtr<URLAndReferrerInfo> target =
+      SVGObserverUtils::HrefToURI(mContent, href);
     observer = SVGObserverUtils::GetTemplateElementObserver(target, this,
                  SVGObserverUtils::HrefToTemplateProperty());
     if (!observer) {
