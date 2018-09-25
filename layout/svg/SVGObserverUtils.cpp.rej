@@ -1,0 +1,19 @@
+--- SVGObserverUtils.cpp
++++ SVGObserverUtils.cpp
+@@ -648,10 +647,13 @@ SVGObserverUtils::GetTextPathsReferencedPath(nsIFrame* aTextPathFrame)
+ 
+     // There's no clear refererer policy spec about non-CSS SVG resource references
+     // Bug 1415044 to investigate which referrer we should use
++
++    nsIDocument* doc = content->OwnerDoc();
++    RefPtr<URLExtraData> extraData =
++      new URLExtraData(base.forget(), doc->GetDocumentURI(),
++                       content->NodePrincipal(), doc->GetReferrerPolicy());
+     RefPtr<URLAndReferrerInfo> target =
+-      new URLAndReferrerInfo(targetURI,
+-                             content->OwnerDoc()->GetDocumentURI(),
+-                             content->OwnerDoc()->GetReferrerPolicy());
++      new URLAndReferrerInfo(targetURI.forget(), extraData.forget());
+ 
+     property = GetEffectProperty(target, aTextPathFrame,
+                                  HrefAsTextPathProperty());

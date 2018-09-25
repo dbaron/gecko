@@ -137,18 +137,8 @@ nsSVGFilterFrame::GetReferencedFilter()
       return nullptr; // no URL
     }
 
-    // Convert href to an nsIURI
-    nsCOMPtr<nsIURI> targetURI;
-    nsCOMPtr<nsIURI> base = mContent->GetBaseURI();
-    nsContentUtils::NewURIWithDocumentCharset(getter_AddRefs(targetURI), href,
-                                              mContent->GetUncomposedDoc(), base);
-
-    // There's no clear refererer policy spec about non-CSS SVG resource references
-    // Bug 1415044 to investigate which referrer we should use
     RefPtr<URLAndReferrerInfo> target =
-      new URLAndReferrerInfo(targetURI,
-                             mContent->OwnerDoc()->GetDocumentURI(),
-                             mContent->OwnerDoc()->GetReferrerPolicy());
+      SVGObserverUtils::HrefToURL(mContent, href);
     observer = SVGObserverUtils::GetTemplateElementObserver(target, this,
                  SVGObserverUtils::HrefToTemplateProperty());
     if (!observer) {

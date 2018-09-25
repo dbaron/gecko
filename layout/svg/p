@@ -1,0 +1,103 @@
+diff --git a/layout/svg/SVGObserverUtils.cpp b/layout/svg/SVGObserverUtils.cpp
+index 3b21b573bb91..fdffa6ef56d6 100644
+--- a/layout/svg/SVGObserverUtils.cpp
++++ b/layout/svg/SVGObserverUtils.cpp
+@@ -339,9 +339,8 @@ SVGFilterObserverList::SVGFilterObserverList(const nsTArray<nsStyleFilter>& aFil
+         aFilters[i].GetURL()->ResolveLocalRef(aFilteredElement);
+       if (resolvedURI) {
+         filterURL = new URLAndReferrerInfo(
+-          resolvedURI,
+-          aFilters[i].GetURL()->mExtraData->GetReferrer(),
+-          aFilters[i].GetURL()->mExtraData->GetReferrerPolicy());
++          resolvedURI.forget(),
++          do_AddRef(aFilters[i].GetURL()->mExtraData));
+       }
+     }
+ 
+@@ -649,10 +648,13 @@ SVGObserverUtils::GetTextPathsReferencedPath(nsIFrame* aTextPathFrame)
+ 
+     // There's no clear refererer policy spec about non-CSS SVG resource references
+     // Bug 1415044 to investigate which referrer we should use
++
++    nsIDocument* doc = content->OwnerDoc();
++    RefPtr<URLExtraData> extraData =
++      new URLExtraData(base.forget(), doc->GetDocumentURI(),
++                       content->NodePrincipal(), doc->GetReferrerPolicy());
+     RefPtr<URLAndReferrerInfo> target =
+-      new URLAndReferrerInfo(targetURI,
+-                             content->OwnerDoc()->GetDocumentURI(),
+-                             content->OwnerDoc()->GetReferrerPolicy());
++      new URLAndReferrerInfo(targetURI.forget(), extraData.forget());
+ 
+     property = GetEffectProperty(target, aTextPathFrame,
+                                  HrefAsTextPathProperty());
+@@ -1129,9 +1131,7 @@ ResolveURLUsingLocalRef(nsIFrame* aFrame, const css::URLValueData* aURL)
+     if (!uri) {
+       return nullptr;
+     }
+-    result = new URLAndReferrerInfo(uri,
+-                                    aURL->mExtraData->GetReferrer(),
+-                                    aURL->mExtraData->GetReferrerPolicy());
++    result = new URLAndReferrerInfo(uri.forget(), do_AddRef(aURL->mExtraData));
+     return result.forget();
+   }
+ 
+@@ -1143,9 +1143,13 @@ ResolveURLUsingLocalRef(nsIFrame* aFrame, const css::URLValueData* aURL)
+     return nullptr;
+   }
+ 
+-  result = new URLAndReferrerInfo(resolvedURI,
+-                                  aURL->mExtraData->GetReferrer(),
+-                                  aURL->mExtraData->GetReferrerPolicy());
++  URLExtraData *oldExtraData = aURL->mExtraData;
++  RefPtr<URLExtraData> newExtraData =
++    new URLExtraData(baseURI.forget(), do_AddRef(oldExtraData->GetReferrer()),
++                     do_AddRef(oldExtraData->GetPrincipal()),
++                     oldExtraData->GetReferrerPolicy());
++
++  result = new URLAndReferrerInfo(resolvedURI.forget(), newExtraData.forget());
+   return result.forget();
+ }
+ 
+diff --git a/layout/svg/SVGObserverUtils.h b/layout/svg/SVGObserverUtils.h
+index dcf00db75312..bda6a4ca385a 100644
+--- a/layout/svg/SVGObserverUtils.h
++++ b/layout/svg/SVGObserverUtils.h
+@@ -50,27 +50,24 @@ namespace mozilla {
+ class URLAndReferrerInfo
+ {
+ public:
+-  URLAndReferrerInfo(nsIURI* aURI, nsIURI* aReferrer,
+-                     mozilla::net::ReferrerPolicy aReferrerPolicy)
+-    : mURI(aURI)
+-    , mReferrer(aReferrer)
+-    , mReferrerPolicy(aReferrerPolicy)
+- {
+-   MOZ_ASSERT(aURI);
+- }
++  URLAndReferrerInfo(already_AddRefed<nsIURI> aURI,
++                     already_AddRefed<URLExtraData> aExtraData)
++    : mURI(std::move(aURI))
++    , mExtraData(std::move(aExtraData))
++  {
++    MOZ_ASSERT(aURI);
++  }
+ 
+   NS_INLINE_DECL_REFCOUNTING(URLAndReferrerInfo)
+ 
+-  nsIURI* GetURI() { return mURI; }
+-  nsIURI* GetReferrer() { return mReferrer; }
+-  mozilla::net::ReferrerPolicy GetReferrerPolicy() { return mReferrerPolicy; }
++  nsIURI* URI() { return mURI; }
++  URLExtraData* ExtraData() { return mExtraData; }
+ 
+ private:
+   ~URLAndReferrerInfo() = default;
+ 
+   nsCOMPtr<nsIURI> mURI;
+-  nsCOMPtr<nsIURI> mReferrer;
+-  mozilla::net::ReferrerPolicy mReferrerPolicy;
++  nsCOMPtr<URLExtraData> mExtraData;
+ };
+ 
+ /*

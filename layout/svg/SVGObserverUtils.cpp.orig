@@ -637,7 +637,7 @@ SVGObserverUtils::HrefToURL(nsIContent* aContent, const nsString& aHref)
                                             aContent->GetUncomposedDoc(), base);
   nsIDocument* doc = aContent->OwnerDoc();
 
-  // There's no clear referrer policy spec about non-CSS SVG resource references
+  // There's no clear refererer policy spec about non-CSS SVG resource references
   // Bug 1415044 to investigate which referrer we should use
   RefPtr<URLAndReferrerInfo> target =
     new URLAndReferrerInfo(targetURI,

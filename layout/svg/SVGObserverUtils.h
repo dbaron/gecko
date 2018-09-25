@@ -715,6 +715,9 @@ public:
   static void InvalidateDirectRenderingObservers(Element* aElement, uint32_t aFlags = 0);
   static void InvalidateDirectRenderingObservers(nsIFrame* aFrame, uint32_t aFlags = 0);
 
+  static already_AddRefed<URLAndReferrerInfo>
+  HrefToURL(nsIContent* aContent, const nsString& aHref);
+
   /**
    * Get the paint server for a aTargetFrame.
    */
