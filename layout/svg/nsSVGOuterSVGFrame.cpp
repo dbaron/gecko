@@ -423,9 +423,9 @@ void nsSVGOuterSVGFrame::Reflow(nsPresContext* aPresContext,
     //
     if (svgElem->HasViewBoxOrSyntheticViewBox()) {
       nsIFrame* anonChild = PrincipalChildList().FirstChild();
-      anonChild->AddStateBits(NS_FRAME_IS_DIRTY);
+      anonChild->MarkSubtreeDirty();
       for (nsIFrame* child : anonChild->PrincipalChildList()) {
-        child->AddStateBits(NS_FRAME_IS_DIRTY);
+        child->MarkSubtreeDirty();
       }
     }
     changeBits |= COORD_CONTEXT_CHANGED;
