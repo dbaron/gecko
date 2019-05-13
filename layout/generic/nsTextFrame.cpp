@@ -4828,7 +4828,7 @@ nsresult nsTextFrame::CharacterDataChanged(
         // Note: if the parent is a block, we're cheating here because we should
         // be marking our line dirty, but we're not. nsTextFrame::SetLength will
         // do that when it gets called during reflow.
-        textFrame->AddStateBits(NS_FRAME_IS_DIRTY);
+        textFrame->MarkSubtreeDirty();
       }
     }
     textFrame->InvalidateFrame();

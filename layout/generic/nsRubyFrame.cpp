@@ -125,7 +125,7 @@ void nsRubyFrame::Reflow(nsPresContext* aPresContext,
     if (child->HasAnyStateBits(NS_FRAME_IS_DIRTY) &&
         child->IsRubyTextContainerFrame()) {
       for (nsIFrame* grandchild : child->PrincipalChildList()) {
-        grandchild->AddStateBits(NS_FRAME_IS_DIRTY);
+        grandchild->MarkSubtreeDirty();
       }
       // Replace NS_FRAME_IS_DIRTY with NS_FRAME_HAS_DIRTY_CHILDREN so
       // we still have a dirty marking, but one that we won't transfer
