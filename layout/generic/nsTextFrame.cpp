@@ -4749,7 +4749,7 @@ void nsTextFrame::NotifyNativeAnonymousTextnodeChange(uint32_t aOldLength) {
 
   // This is to avoid making a new Reflow request in CharacterDataChanged:
   for (nsTextFrame* f = this; f; f = f->GetNextContinuation()) {
-    f->AddStateBits(NS_FRAME_IS_DIRTY);
+    f->MarkSubtreeDirty();
     f->mReflowRequestedForCharDataChange = true;
   }
 
