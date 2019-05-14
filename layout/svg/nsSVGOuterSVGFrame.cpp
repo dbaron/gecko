@@ -450,7 +450,6 @@ void nsSVGOuterSVGFrame::Reflow(nsPresContext* aPresContext,
   } else {
     // Update the mRects and visual overflow rects of all our descendants,
     // including our anonymous wrapper kid:
-    anonKid->AddStateBits(mState & NS_FRAME_IS_DIRTY);
     anonKid->ReflowSVG();
     MOZ_ASSERT(!anonKid->GetNextSibling(),
                "We should have one anonymous child frame wrapping our real "
