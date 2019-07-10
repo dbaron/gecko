@@ -641,8 +641,16 @@ nsColumnSetFrame::ColumnBalanceData nsColumnSetFrame::ReflowChildren(
                            !NS_SUBTREE_DIRTY(child->GetNextSibling());
     // If column-fill is auto (not the default), then we might need to
     // move content between columns for any change in column block-size.
+    //
+    // The same is true if we have a non-'auto' computed block-size.
+    //
+    // FIXME: It's not clear to me why it's *ever* valid to have
+    // skipIncremental be true when changingBSize is true, since it
+    // seems like a child broken over multiple columns might need to
+    // change the size of the fragment in each column.
     if (skipIncremental && changingBSize &&
-        StyleColumn()->mColumnFill == StyleColumnFill::Auto) {
+        (StyleColumn()->mColumnFill == StyleColumnFill::Auto ||
+         aReflowInput.ComputedBSize() != NS_UNCONSTRAINEDSIZE)) {
       skipIncremental = false;
     }
     // If we need to pull up content from the prev-in-flow then this is not just
