@@ -1303,6 +1303,7 @@ void nsColumnSetFrame::AppendFrames(ChildListID aListID,
 }
 
 void nsColumnSetFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
+                                    const nsLineList::iterator* aPrevFrameLine,
                                     nsFrameList& aFrameList) {
   MOZ_CRASH("unsupported operation");
 }
