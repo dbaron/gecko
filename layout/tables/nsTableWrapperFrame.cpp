@@ -127,9 +127,10 @@ void nsTableWrapperFrame::AppendFrames(ChildListID aListID,
   MarkNeedsDisplayItemRebuild();
 }
 
-void nsTableWrapperFrame::InsertFrames(ChildListID aListID,
-                                       nsIFrame* aPrevFrame,
-                                       nsFrameList& aFrameList) {
+void nsTableWrapperFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   MOZ_ASSERT(kCaptionList == aListID, "unexpected child list");
   MOZ_ASSERT(aFrameList.IsEmpty() || aFrameList.FirstChild()->IsTableCaption(),
              "inserting non-caption frame into captionList");

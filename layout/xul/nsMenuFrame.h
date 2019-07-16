@@ -116,6 +116,7 @@ class nsMenuFrame final : public nsBoxFrame, public nsIReflowCallback {
   virtual void AppendFrames(ChildListID aListID,
                             nsFrameList& aFrameList) override;
   virtual void InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
+                            mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
                             nsFrameList& aFrameList) override;
   virtual void RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) override;
 

@@ -118,10 +118,12 @@ void nsSliderFrame::RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) {
   if (mFrames.IsEmpty()) RemoveListener();
 }
 
-void nsSliderFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                 nsFrameList& aFrameList) {
+void nsSliderFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   bool wasEmpty = mFrames.IsEmpty();
-  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine, aFrameList);
   if (wasEmpty) AddListener();
 }
 

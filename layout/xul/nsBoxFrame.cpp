@@ -883,8 +883,10 @@ void nsBoxFrame::RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) {
                                 NS_FRAME_HAS_DIRTY_CHILDREN);
 }
 
-void nsBoxFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                              nsFrameList& aFrameList) {
+void nsBoxFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   NS_ASSERTION(!aPrevFrame || aPrevFrame->GetParent() == this,
                "inserting after sibling frame with different parent");
   NS_ASSERTION(!aPrevFrame || mFrames.ContainsFrame(aPrevFrame),

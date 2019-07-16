@@ -393,9 +393,10 @@ void nsHTMLButtonControlFrame::AppendFrames(ChildListID aListID,
   MOZ_CRASH("unsupported operation");
 }
 
-void nsHTMLButtonControlFrame::InsertFrames(ChildListID aListID,
-                                            nsIFrame* aPrevFrame,
-                                            nsFrameList& aFrameList) {
+void nsHTMLButtonControlFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   MOZ_CRASH("unsupported operation");
 }
 

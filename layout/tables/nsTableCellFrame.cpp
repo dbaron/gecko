@@ -237,8 +237,10 @@ void nsTableCellFrame::AppendFrames(ChildListID aListID,
   MOZ_CRASH("unsupported operation");
 }
 
-void nsTableCellFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                    nsFrameList& aFrameList) {
+void nsTableCellFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   MOZ_CRASH("unsupported operation");
 }
 

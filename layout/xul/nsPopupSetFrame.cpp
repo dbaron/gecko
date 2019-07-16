@@ -54,13 +54,15 @@ void nsPopupSetFrame::RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) {
   nsBoxFrame::RemoveFrame(aListID, aOldFrame);
 }
 
-void nsPopupSetFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                   nsFrameList& aFrameList) {
+void nsPopupSetFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   if (aListID == kPopupList) {
     AddPopupFrameList(aFrameList);
     return;
   }
-  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine, aFrameList);
 }
 
 void nsPopupSetFrame::SetInitialChildList(ChildListID aListID,

@@ -319,7 +319,8 @@ nsresult nsFirstLetterFrame::CreateContinuationForFloatingParent(
   // except we have to insert it in a different place and we don't want a
   // reflow command to try to be issued.
   nsFrameList temp(continuation, continuation);
-  parent->InsertFrames(kNoReflowPrincipalList, placeholderFrame, temp);
+  parent->InsertFrames(kNoReflowPrincipalList, placeholderFrame, Nothing(),
+                       temp);
 
   *aContinuation = continuation;
   return NS_OK;

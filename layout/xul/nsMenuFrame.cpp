@@ -1144,8 +1144,10 @@ void nsMenuFrame::RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) {
   nsBoxFrame::RemoveFrame(aListID, aOldFrame);
 }
 
-void nsMenuFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                               nsFrameList& aFrameList) {
+void nsMenuFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   if (!HasPopup() && (aListID == kPrincipalList || aListID == kPopupList)) {
     SetPopupFrame(aFrameList);
     if (HasPopup()) {
@@ -1160,7 +1162,7 @@ void nsMenuFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
     aPrevFrame = nullptr;
   }
 
-  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine, aFrameList);
 }
 
 void nsMenuFrame::AppendFrames(ChildListID aListID, nsFrameList& aFrameList) {

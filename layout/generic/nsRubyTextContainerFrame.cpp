@@ -70,10 +70,12 @@ void nsRubyTextContainerFrame::AppendFrames(ChildListID aListID,
 }
 
 /* virtual */
-void nsRubyTextContainerFrame::InsertFrames(ChildListID aListID,
-                                            nsIFrame* aPrevFrame,
-                                            nsFrameList& aFrameList) {
-  nsContainerFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+void nsRubyTextContainerFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
+  nsContainerFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine,
+                                 aFrameList);
   UpdateSpanFlag();
 }
 

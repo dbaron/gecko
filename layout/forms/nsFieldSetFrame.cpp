@@ -671,8 +671,10 @@ void nsFieldSetFrame::AppendFrames(ChildListID aListID,
   MOZ_CRASH("nsFieldSetFrame::AppendFrames not supported");
 }
 
-void nsFieldSetFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                   nsFrameList& aFrameList) {
+void nsFieldSetFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   MOZ_CRASH("nsFieldSetFrame::InsertFrames not supported");
 }
 

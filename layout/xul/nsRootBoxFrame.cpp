@@ -67,6 +67,7 @@ class nsRootBoxFrame final : public nsBoxFrame, public nsIPopupContainer {
   virtual void AppendFrames(ChildListID aListID,
                             nsFrameList& aFrameList) override;
   virtual void InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
+                            mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
                             nsFrameList& aFrameList) override;
   virtual void RemoveFrame(ChildListID aListID, nsIFrame* aOldFrame) override;
 
@@ -123,8 +124,10 @@ void nsRootBoxFrame::AppendFrames(ChildListID aListID,
   nsBoxFrame::AppendFrames(aListID, aFrameList);
 }
 
-void nsRootBoxFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                  nsFrameList& aFrameList) {
+void nsRootBoxFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   // Because we only support a single child frame inserting is the same
   // as appending.
   MOZ_ASSERT(!aPrevFrame, "unexpected previous sibling frame");
