@@ -10,9 +10,11 @@
 #define nsContainerFrame_h___
 
 #include "mozilla/Attributes.h"
+#include "mozilla/Maybe.h"
 #include "nsSplittableFrame.h"
 #include "nsFrameList.h"
 #include "nsLayoutUtils.h"
+#include "nsLineBox.h"
 
 // Option flags for ReflowChild() and FinishReflowChild()
 // member functions
@@ -114,10 +116,13 @@ class nsContainerFrame : public nsSplittableFrame {
    *
    * @param   aListID the child list identifier.
    * @param   aPrevFrame the frame to insert frames <b>after</b>
+   * @param   aPrevFrameLine (optional) if present, the line box that
+   *            aPrevFrame is part of.
    * @param   aFrameList list of child frames to insert <b>after</b> aPrevFrame.
    *            Each of the frames has its NS_FRAME_IS_DIRTY bit set
    */
   virtual void InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
+                            mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
                             nsFrameList& aFrameList);
 
   /**

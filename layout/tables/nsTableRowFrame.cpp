@@ -204,8 +204,10 @@ void nsTableRowFrame::AppendFrames(ChildListID aListID,
   tableFrame->SetGeometryDirty();
 }
 
-void nsTableRowFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                   nsFrameList& aFrameList) {
+void nsTableRowFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   NS_ASSERTION(aListID == kPrincipalList, "unexpected child list");
   NS_ASSERTION(!aPrevFrame || aPrevFrame->GetParent() == this,
                "inserting after sibling frame with different parent");

@@ -229,8 +229,10 @@ void nsHTMLScrollFrame::AppendFrames(ChildListID aListID,
   mHelper.ReloadChildFrames();
 }
 
-void nsHTMLScrollFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                     nsFrameList& aFrameList) {
+void nsHTMLScrollFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   NS_ASSERTION(aListID == kPrincipalList, "Only main list supported");
   NS_ASSERTION(!aPrevFrame || aPrevFrame->GetParent() == this,
                "inserting after sibling frame with different parent");
@@ -1576,9 +1578,11 @@ void nsXULScrollFrame::AppendFrames(ChildListID aListID,
   mHelper.ReloadChildFrames();
 }
 
-void nsXULScrollFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                    nsFrameList& aFrameList) {
-  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+void nsXULScrollFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
+  nsBoxFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine, aFrameList);
   mHelper.ReloadChildFrames();
 }
 

@@ -127,11 +127,12 @@ void ColumnSetWrapperFrame::AppendFrames(ChildListID aListID,
 #endif
 }
 
-void ColumnSetWrapperFrame::InsertFrames(ChildListID aListID,
-                                         nsIFrame* aPrevFrame,
-                                         nsFrameList& aFrameList) {
+void ColumnSetWrapperFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   MOZ_ASSERT_UNREACHABLE("Unsupported operation!");
-  nsBlockFrame::InsertFrames(aListID, aPrevFrame, aFrameList);
+  nsBlockFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine, aFrameList);
 }
 
 void ColumnSetWrapperFrame::RemoveFrame(ChildListID aListID,

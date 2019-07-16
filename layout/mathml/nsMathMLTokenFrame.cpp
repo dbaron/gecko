@@ -99,9 +99,12 @@ void nsMathMLTokenFrame::AppendFrames(ChildListID aListID,
   MarkTextFramesAsTokenMathML();
 }
 
-void nsMathMLTokenFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                      nsFrameList& aChildList) {
-  nsMathMLContainerFrame::InsertFrames(aListID, aPrevFrame, aChildList);
+void nsMathMLTokenFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aChildList) {
+  nsMathMLContainerFrame::InsertFrames(aListID, aPrevFrame, aPrevFrameLine,
+                                       aChildList);
   MarkTextFramesAsTokenMathML();
 }
 

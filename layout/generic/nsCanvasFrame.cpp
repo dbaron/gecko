@@ -267,8 +267,10 @@ void nsCanvasFrame::AppendFrames(ChildListID aListID, nsFrameList& aFrameList) {
   MaybePropagateRootElementWritingMode();
 }
 
-void nsCanvasFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
-                                 nsFrameList& aFrameList) {
+void nsCanvasFrame::InsertFrames(
+    ChildListID aListID, nsIFrame* aPrevFrame,
+    mozilla::Maybe<nsLineList::iterator> aPrevFrameLine,
+    nsFrameList& aFrameList) {
   // Because we only support a single child frame inserting is the same
   // as appending
   MOZ_ASSERT(!aPrevFrame, "unexpected previous sibling frame");
