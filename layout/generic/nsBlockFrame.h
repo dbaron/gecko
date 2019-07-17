@@ -998,6 +998,9 @@ class nsBlockInFlowLineIterator {
   nsBlockInFlowLineIterator(nsBlockFrame* aFrame, nsIFrame* aFindFrame,
                             bool* aFoundValidLine);
 
+  // Allow to be uninitialized (and then assigned from another object).
+  nsBlockInFlowLineIterator() {}
+
   LineIterator GetLine() { return mLine; }
   bool IsLastLineInList();
   nsBlockFrame* GetContainer() { return mFrame; }
