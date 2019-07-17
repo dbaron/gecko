@@ -7,6 +7,7 @@
 #include "nsBidiPresUtils.h"
 
 #include "mozilla/IntegerRange.h"
+#include "mozilla/Maybe.h"
 #include "mozilla/PresShell.h"
 #include "mozilla/dom/Text.h"
 
@@ -119,7 +120,7 @@ struct MOZ_STACK_CLASS BidiParagraphData {
   nsAutoString mBuffer;
   AutoTArray<char16_t, 16> mEmbeddingStack;
   AutoTArray<nsIFrame*, 16> mLogicalFrames;
-  AutoTArray<nsLineBox*, 16> mLinePerFrame;
+  AutoTArray<Maybe<nsLineList::iterator>, 16> mLinePerFrame;
   nsDataHashtable<nsPtrHashKey<const nsIContent>, int32_t> mContentToFrameIndex;
   // Cached presentation context for the frames we're processing.
   nsPresContext* mPresContext;
@@ -219,7 +220,7 @@ struct MOZ_STACK_CLASS BidiParagraphData {
     for (uint32_t i = 0; i < mEmbeddingStack.Length(); ++i) {
       mBuffer.Append(mEmbeddingStack[i]);
       mLogicalFrames.AppendElement(NS_BIDI_CONTROL_FRAME);
-      mLinePerFrame.AppendElement((nsLineBox*)nullptr);
+      mLinePerFrame.AppendElement(Nothing());
     }
   }
 
@@ -231,7 +232,7 @@ struct MOZ_STACK_CLASS BidiParagraphData {
     mLogicalFrames.AppendElement(aFrame);
 
     AdvanceLineIteratorToFrame(aFrame, aLineIter, mPrevFrame);
-    mLinePerFrame.AppendElement(aLineIter->GetLine().get());
+    mLinePerFrame.AppendElement(Some(aLineIter->GetLine()));
   }
 
   void AdvanceAndAppendFrame(nsIFrame** aFrame,
@@ -269,7 +270,9 @@ struct MOZ_STACK_CLASS BidiParagraphData {
 
   nsIFrame* FrameAt(int32_t aIndex) { return mLogicalFrames[aIndex]; }
 
-  nsLineBox* GetLineForFrameAt(int32_t aIndex) { return mLinePerFrame[aIndex]; }
+  const Maybe<nsLineList::iterator>& GetLineForFrameAt(int32_t aIndex) {
+    return mLinePerFrame[aIndex];
+  }
 
   void AppendUnichar(char16_t aCh) { mBuffer.Append(aCh); }
 
@@ -279,7 +282,7 @@ struct MOZ_STACK_CLASS BidiParagraphData {
 
   void AppendControlChar(char16_t aCh) {
     mLogicalFrames.AppendElement(NS_BIDI_CONTROL_FRAME);
-    mLinePerFrame.AppendElement((nsLineBox*)nullptr);
+    mLinePerFrame.AppendElement(Nothing());
     AppendUnichar(aCh);
   }
 
@@ -743,7 +746,7 @@ nsresult nsBidiPresUtils::ResolveParagraph(BidiParagraphData* aBpd) {
   nsIContent* content = nullptr;
   int32_t contentTextLength = 0;
 
-  nsLineBox* currentLine = nullptr;
+  Maybe<nsLineList::iterator> currentLine = Nothing();
 
 #ifdef DEBUG
 #  ifdef NOISY_BIDI
@@ -877,7 +880,7 @@ nsresult nsBidiPresUtils::ResolveParagraph(BidiParagraphData* aBpd) {
            * run. Create a non-fluid continuation frame for the next directional
            * run.
            */
-          currentLine->MarkDirty();
+          currentLine.value()->MarkDirty();
           nsIFrame* nextBidi;
           int32_t runEnd = contentOffset + runLength;
           rv = EnsureBidiContinuation(frame, &nextBidi, contentOffset, runEnd);
@@ -926,7 +929,7 @@ nsresult nsBidiPresUtils::ResolveParagraph(BidiParagraphData* aBpd) {
              */
             int32_t newIndex = aBpd->GetLastFrameForContent(content);
             if (newIndex > frameIndex) {
-              currentLine->MarkDirty();
+              currentLine.value()->MarkDirty();
               RemoveBidiContinuation(aBpd, frame, frameIndex, newIndex);
               frameIndex = newIndex;
               frame = aBpd->FrameAt(frameIndex);
@@ -943,7 +946,7 @@ nsresult nsBidiPresUtils::ResolveParagraph(BidiParagraphData* aBpd) {
             } while (++newIndex < frameCount &&
                      aBpd->FrameAt(newIndex) == NS_BIDI_CONTROL_FRAME);
             if (newIndex < frameCount) {
-              currentLine->MarkDirty();
+              currentLine.value()->MarkDirty();
               RemoveBidiContinuation(aBpd, frame, frameIndex, newIndex);
             }
           } else if (runLength == fragmentLength) {
@@ -954,7 +957,7 @@ nsresult nsBidiPresUtils::ResolveParagraph(BidiParagraphData* aBpd) {
              */
             nsIFrame* next = frame->GetNextInFlow();
             if (next) {
-              currentLine->MarkDirty();
+              currentLine.value()->MarkDirty();
               MakeContinuationsNonFluidUpParentChain(frame, next);
             }
           }
@@ -1201,7 +1204,9 @@ void nsBidiPresUtils::TraverseFrames(nsBlockInFlowLineIterator* aLineIter,
                   createdContinuation = true;
                 }
                 // Mark the line before the newline as dirty.
-                aBpd->GetLineForFrameAt(aBpd->FrameCount() - 1)->MarkDirty();
+                aBpd->GetLineForFrameAt(aBpd->FrameCount() - 1)
+                    .value()
+                    ->MarkDirty();
               }
               ResolveParagraphWithinBlock(aBpd);
 
@@ -1211,7 +1216,9 @@ void nsBidiPresUtils::TraverseFrames(nsBlockInFlowLineIterator* aLineIter,
                 frame = next;
                 aBpd->AppendFrame(frame, aLineIter);
                 // Mark the line after the newline as dirty.
-                aBpd->GetLineForFrameAt(aBpd->FrameCount() - 1)->MarkDirty();
+                aBpd->GetLineForFrameAt(aBpd->FrameCount() - 1)
+                    .value()
+                    ->MarkDirty();
               }
 
               /*
