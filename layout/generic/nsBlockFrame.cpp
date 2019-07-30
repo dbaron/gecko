@@ -2449,6 +2449,7 @@ void nsBlockFrame::ReflowDirtyLines(BlockReflowInput& aState) {
     // to reflow any line that might have floats in it, both because the
     // breakpoints within those floats may have changed and because we
     // might have to push/pull the floats in their entirety.
+    // Also see equivalent code in DrainOverflowLines.
     // FIXME: What about a deltaBCoord or block-size change that forces us to
     // push lines?  Why does that work?
     if (!line->IsDirty() &&
@@ -2820,6 +2821,9 @@ void nsBlockFrame::ReflowDirtyLines(BlockReflowInput& aState) {
         // line to be created; see SplitLine's callers for examples of
         // when this happens).
         while (line != LinesEnd()) {
+          // FIXME: There are probably cases where we don't need to
+          // reflow the line -- but we'd need all the logic in the main
+          // loop above to determine that!
           ReflowLine(aState, line, &keepGoing);
 
           if (aState.mReflowInput.WillReflowAgainForClearance()) {
@@ -5014,8 +5018,16 @@ bool nsBlockFrame::DrainOverflowLines() {
         // also recompute the correct deltaBCoord if necessary.
         mLines.front()->MarkPreviousMarginDirty();
       }
-      // The overflow lines have already been marked dirty and their previous
-      // margins marked dirty also.
+
+      // We don't need to reflow all overflow lines that we're pulling; they
+      // might be clean.  But we need to reflow anything that might have a
+      // float in it.
+      // See equivalent code in ReflowDirtyLines.
+      for (nsLineList::iterator line = overflowLines->mLines.begin(), lineEnd = overflowLines->mLines.end(); line != lineEnd; ++line) {
+        if (line->IsBlock() || line->HasFloats() || line->HadFloatPushed()) {
+          line->MarkDirty();
+        }
+      }
 
       // Prepend the overflow frames/lines to our principal list.
       mFrames.InsertFrames(nullptr, nullptr, overflowLines->mFrames);
