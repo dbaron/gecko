@@ -216,6 +216,7 @@ ReflowInput::ReflowInput(nsPresContext* aPresContext,
   mFlags.mBClampMarginBoxMinSize = !!(aFlags & B_CLAMP_MARGIN_BOX_MIN_SIZE);
   mFlags.mApplyAutoMinSize = !!(aFlags & I_APPLY_AUTO_MIN_SIZE);
   mFlags.mApplyLineClamp = false;
+  mFlags.mMovedBlockFragments = aParentReflowInput.mFlags.mMovedBlockFragments;
 
   if ((aFlags & DUMMY_PARENT_REFLOW_INPUT) ||
       (mParentReflowInput->mFlags.mDummyParentReflowInput &&
