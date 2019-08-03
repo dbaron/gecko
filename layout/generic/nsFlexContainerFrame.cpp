@@ -5210,14 +5210,9 @@ void nsFlexContainerFrame::ReflowFlexItem(
              "We gave flex item unconstrained available height, so it "
              "should be complete");
 
-  LogicalMargin offsets =
-      childReflowInput.ComputedLogicalOffsets().ConvertTo(outerWM, wm);
-  ReflowInput::ApplyRelativePositioning(aItem.Frame(), outerWM, offsets,
-                                        &aFramePos, aContainerSize);
-
   FinishReflowChild(aItem.Frame(), aPresContext, childDesiredSize,
                     &childReflowInput, outerWM, aFramePos, aContainerSize,
-                    ReflowChildFlags::Default);
+                    ReflowChildFlags::ApplyRelativePositioning);
 
   aItem.SetAscent(childDesiredSize.BlockStartAscent());
 }

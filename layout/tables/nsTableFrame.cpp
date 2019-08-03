@@ -2692,7 +2692,7 @@ void nsTableFrame::PlaceChild(TableReflowInput& aReflowInput,
   // Place and size the child
   FinishReflowChild(aKidFrame, PresContext(), aKidDesiredSize, &aKidReflowInput,
                     wm, LogicalPoint(wm, aKidPosition, containerSize),
-                    containerSize, ReflowChildFlags::Default);
+                    containerSize, ReflowChildFlags::ApplyRelativePositioning);
 
   InvalidateTableFrame(aKidFrame, aOriginalKidRect, aOriginalKidVisualOverflow,
                        isFirstReflow);
@@ -2866,7 +2866,6 @@ void nsTableFrame::PlaceRepeatedFooter(TableReflowInput& aReflowInput,
   ReflowChild(aTfoot, presContext, desiredSize, footerReflowInput, wm,
               kidPosition, containerSize, ReflowChildFlags::Default,
               footerStatus);
-  footerReflowInput.ApplyRelativePositioning(&kidPosition, containerSize);
 
   PlaceChild(aReflowInput, aTfoot, footerReflowInput,
              // We subtract desiredSize.PhysicalSize() from containerSize here
@@ -3027,7 +3026,6 @@ void nsTableFrame::ReflowChildren(TableReflowInput& aReflowInput,
       ReflowChild(kidFrame, presContext, desiredSize, kidReflowInput, wm,
                   kidPosition, containerSize, ReflowChildFlags::Default,
                   aStatus);
-      kidReflowInput.ApplyRelativePositioning(&kidPosition, containerSize);
 
       if (reorder) {
         // reorder row groups the reflow may have changed the nextinflows
