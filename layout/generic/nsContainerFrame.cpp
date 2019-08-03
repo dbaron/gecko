@@ -1013,6 +1013,8 @@ void nsContainerFrame::FinishReflowChild(
     const ReflowOutput& aDesiredSize, const ReflowInput* aReflowInput,
     const WritingMode& aWM, const LogicalPoint& aPos,
     const nsSize& aContainerSize, nsIFrame::ReflowChildFlags aFlags) {
+  MOZ_ASSERT(!aReflowInput || aReflowInput->mFrame == aKidFrame);
+  MOZ_ASSERT(aDesiredSize.GetWritingMode() == aKidFrame->GetWritingMode());
   MOZ_ASSERT(aReflowInput || aKidFrame->IsFrameOfType(eMathML) ||
                  aKidFrame->IsTableCellFrame(),
              "aReflowInput should be passed in almost all cases");
@@ -1023,13 +1025,21 @@ void nsContainerFrame::FinishReflowChild(
   }
 
   nsPoint curOrigin = aKidFrame->GetPosition();
-  WritingMode outerWM = aDesiredSize.GetWritingMode();
-  LogicalSize convertedSize =
-      aDesiredSize.Size(outerWM).ConvertTo(aWM, outerWM);
+  WritingMode kidWM = aDesiredSize.GetWritingMode();
+  LogicalSize convertedSize = aDesiredSize.Size(kidWM).ConvertTo(aWM, kidWM);
+  LogicalPoint pos(aPos);
+
+  if (aFlags & ReflowChildFlags::ApplyRelativePositioning) {
+    MOZ_ASSERT(aReflowInput, "caller must have passed reflow input");
+    // ApplyRelativePositioning in right-to-left writing modes needs to know
+    // the updated frame width to set the normal position correctly.
+    aKidFrame->SetSize(aWM, convertedSize);
+    aReflowInput->ApplyRelativePositioning(&pos, aContainerSize);
+  }
 
   if (ReflowChildFlags::NoMoveFrame !=
       (aFlags & ReflowChildFlags::NoMoveFrame)) {
-    aKidFrame->SetRect(aWM, LogicalRect(aWM, aPos, convertedSize),
+    aKidFrame->SetRect(aWM, LogicalRect(aWM, pos, convertedSize),
                        aContainerSize);
   } else {
     aKidFrame->SetSize(aWM, convertedSize);
@@ -1066,14 +1076,19 @@ void nsContainerFrame::FinishReflowChild(nsIFrame* aKidFrame,
                                          const ReflowInput* aReflowInput,
                                          nscoord aX, nscoord aY,
                                          ReflowChildFlags aFlags) {
+  MOZ_ASSERT(!(aFlags & ReflowChildFlags::ApplyRelativePositioning),
+             "only the logical version supports ApplyRelativePositioning "
+             "since ApplyRelativePositioning requires the container size");
+
   nsPoint curOrigin = aKidFrame->GetPosition();
+  nsPoint pos(aX, aY);
+  nsSize size(aDesiredSize.PhysicalSize());
 
   if (ReflowChildFlags::NoMoveFrame !=
       (aFlags & ReflowChildFlags::NoMoveFrame)) {
-    aKidFrame->SetRect(
-        nsRect(aX, aY, aDesiredSize.Width(), aDesiredSize.Height()));
+    aKidFrame->SetRect(nsRect(pos, size));
   } else {
-    aKidFrame->SetSize(nsSize(aDesiredSize.Width(), aDesiredSize.Height()));
+    aKidFrame->SetSize(size);
   }
 
   if (aKidFrame->HasView()) {
@@ -1084,8 +1099,7 @@ void nsContainerFrame::FinishReflowChild(nsIFrame* aKidFrame,
                              aDesiredSize.VisualOverflow(), aFlags);
   }
 
-  if (!(aFlags & ReflowChildFlags::NoMoveView) &&
-      (curOrigin.x != aX || curOrigin.y != aY)) {
+  if (!(aFlags & ReflowChildFlags::NoMoveView) && curOrigin != pos) {
     if (!aKidFrame->HasView()) {
       // If the frame has moved, then we need to make sure any child views are
       // correctly positioned
