@@ -224,13 +224,9 @@ void nsTableRowFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
       mFrames.InsertFrames(nullptr, aPrevFrame, aFrameList);
 
   // Get the table frame
-  nsTableFrame* tableFrame = GetTableFrame();
-  LayoutFrameType cellFrameType = tableFrame->IsBorderCollapse()
-                                      ? LayoutFrameType::BCTableCell
-                                      : LayoutFrameType::TableCell;
   nsTableCellFrame* prevCellFrame =
-      (nsTableCellFrame*)nsTableFrame::GetFrameAtOrBefore(this, aPrevFrame,
-                                                          cellFrameType);
+      static_cast<nsTableCellFrame*>(nsTableFrame::GetFrameAtOrBefore(
+          this, aPrevFrame, LayoutFrameType::TableCell));
   nsTArray<nsTableCellFrame*> cellChildren;
   for (nsFrameList::Enumerator e(newCells); !e.AtEnd(); e.Next()) {
     nsIFrame* childFrame = e.get();
@@ -243,6 +239,7 @@ void nsTableRowFrame::InsertFrames(ChildListID aListID, nsIFrame* aPrevFrame,
   if (prevCellFrame) {
     colIndex = prevCellFrame->ColIndex();
   }
+  nsTableFrame* tableFrame = GetTableFrame();
   tableFrame->InsertCells(cellChildren, GetRowIndex(), colIndex);
 
   PresShell()->FrameNeedsReflow(this, IntrinsicDirty::TreeChange,
