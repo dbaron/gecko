@@ -2679,12 +2679,20 @@ void nsTableFrame::PlaceChild(TableReflowInput& aReflowInput,
                               ReflowOutput& aKidDesiredSize,
                               const nsRect& aOriginalKidRect,
                               const nsRect& aOriginalKidVisualOverflow) {
-  WritingMode wm = aReflowInput.reflowInput.GetWritingMode();
+  const ReflowInput& tableReflowInput = aReflowInput.reflowInput;
+  WritingMode wm = tableReflowInput.GetWritingMode();
   bool isFirstReflow = aKidFrame->HasAnyStateBits(NS_FRAME_FIRST_REFLOW);
+
+  nsSize containerSize = tableReflowInput.ComputedPhysicalSize();
+  nsMargin containerBorderPadding =
+      tableReflowInput.ComputedPhysicalBorderPadding();
+  containerSize.width += containerBorderPadding.LeftRight();
+  containerSize.height += containerBorderPadding.TopBottom();
 
   // Place and size the child
   FinishReflowChild(aKidFrame, PresContext(), aKidDesiredSize, &aKidReflowInput,
-                    aKidPosition.x, aKidPosition.y, ReflowChildFlags::Default);
+                    wm, LogicalPoint(wm, aKidPosition, containerSize),
+                    containerSize, ReflowChildFlags::Default);
 
   InvalidateTableFrame(aKidFrame, aOriginalKidRect, aOriginalKidVisualOverflow,
                        isFirstReflow);
