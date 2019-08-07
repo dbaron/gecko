@@ -2834,7 +2834,7 @@
   value: false
   mirror: once
 
-- name: gfx.font_ahem_antialias_none
+- name: gfx.font_rendering.ahem_antialias_none
   type: RelaxedAtomicBool
   value: false
   mirror: always
