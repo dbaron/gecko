@@ -240,11 +240,11 @@ nsChangeHint HTMLImageElement::GetAttributeChangeHint(const nsAtom* aAttribute,
   nsChangeHint retval =
       nsGenericHTMLElement::GetAttributeChangeHint(aAttribute, aModType);
   if (aAttribute == nsGkAtoms::usemap || aAttribute == nsGkAtoms::ismap) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   } else if (aAttribute == nsGkAtoms::alt) {
     if (aModType == MutationEvent_Binding::ADDITION ||
         aModType == MutationEvent_Binding::REMOVAL) {
-      retval |= nsChangeHint_ReconstructFrame;
+      retval |= nsChangeHint::ReconstructFrame;
     }
   }
   return retval;

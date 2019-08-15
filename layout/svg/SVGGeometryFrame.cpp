@@ -154,14 +154,14 @@ nsresult SVGGeometryFrame::AttributeChanged(int32_t aNameSpaceID,
                                             int32_t aModType) {
   // We don't invalidate for transform changes (the layers code does that).
   // Also note that SVGTransformableElement::GetAttributeChangeHint will
-  // return nsChangeHint_UpdateOverflow for "transform" attribute changes
+  // return nsChangeHint::UpdateOverflow for "transform" attribute changes
   // and cause DoApplyRenderingChangeToTree to make the SchedulePaint call.
 
   if (aNameSpaceID == kNameSpaceID_None &&
       (static_cast<SVGGeometryElement*>(GetContent())
            ->AttributeDefinesGeometry(aAttribute))) {
     nsLayoutUtils::PostRestyleEvent(mContent->AsElement(), RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     nsSVGUtils::ScheduleReflowSVG(this);
   }
   return NS_OK;
@@ -379,7 +379,7 @@ void SVGGeometryFrame::ReflowSVG() {
   if (mState & NS_FRAME_FIRST_REFLOW) {
     // Make sure we have our filter property (if any) before calling
     // FinishAndStoreOverflow (subsequent filter changes are handled off
-    // nsChangeHint_UpdateEffects):
+    // nsChangeHint::UpdateEffects):
     SVGObserverUtils::UpdateEffects(this);
   }
 

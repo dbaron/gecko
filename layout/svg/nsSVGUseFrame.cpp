@@ -54,7 +54,7 @@ void nsSVGUseFrame::PositionAttributeChanged() {
   // make sure our cached transform matrix gets (lazily) updated
   mCanvasTM = nullptr;
   nsLayoutUtils::PostRestyleEvent(GetContent()->AsElement(), RestyleHint{0},
-                                  nsChangeHint_InvalidateRenderingObservers);
+                                  nsChangeHint::InvalidateRenderingObservers);
   nsSVGUtils::ScheduleReflowSVG(this);
   nsSVGUtils::NotifyChildrenOfSVGChange(this, TRANSFORM_CHANGED);
 }
@@ -69,14 +69,14 @@ void nsSVGUseFrame::DimensionAttributeChanged(bool aHadValidDimensions,
 
   if (invalidate) {
     nsLayoutUtils::PostRestyleEvent(GetContent()->AsElement(), RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     nsSVGUtils::ScheduleReflowSVG(this);
   }
 }
 
 void nsSVGUseFrame::HrefChanged() {
   nsLayoutUtils::PostRestyleEvent(GetContent()->AsElement(), RestyleHint{0},
-                                  nsChangeHint_InvalidateRenderingObservers);
+                                  nsChangeHint::InvalidateRenderingObservers);
   nsSVGUtils::ScheduleReflowSVG(this);
 }
 

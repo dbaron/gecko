@@ -19,13 +19,13 @@
 
 void nsStyleChangeList::AppendChange(nsIFrame* aFrame, nsIContent* aContent,
                                      nsChangeHint aHint) {
-  MOZ_ASSERT(aFrame || (aHint & nsChangeHint_ReconstructFrame),
+  MOZ_ASSERT(aFrame || (aHint & nsChangeHint::ReconstructFrame),
              "must have frame");
   MOZ_ASSERT(aHint, "No hint to process?");
-  MOZ_ASSERT(!(aHint & nsChangeHint_NeutralChange),
+  MOZ_ASSERT(!(aHint & nsChangeHint::NeutralChange),
              "Neutral changes do not need extra processing, "
              "and should be stripped out");
-  MOZ_ASSERT(aContent || !(aHint & nsChangeHint_ReconstructFrame),
+  MOZ_ASSERT(aContent || !(aHint & nsChangeHint::ReconstructFrame),
              "must have content");
   // XXXbz we should make this take Element instead of nsIContent
   MOZ_ASSERT(
@@ -35,15 +35,15 @@ void nsStyleChangeList::AppendChange(nsIFrame* aFrame, nsIContent* aContent,
            Servo_Element_IsDisplayContents(
                aContent->GetFlattenedTreeParentElementForStyle())) ||
           (aContent->IsText() && aContent->HasFlag(NODE_NEEDS_FRAME) &&
-           aHint & nsChangeHint_ReconstructFrame),
+           aHint & nsChangeHint::ReconstructFrame),
       "Shouldn't be trying to restyle non-elements directly, "
       "except if it's a display:contents child or a text node "
       "doing lazy frame construction");
   MOZ_ASSERT(!(aHint & nsChangeHint_AllReflowHints) ||
-                 (aHint & nsChangeHint_NeedReflow),
+                 (aHint & nsChangeHint::NeedReflow),
              "Reflow hint bits set without actually asking for a reflow");
 
-  if (aHint & nsChangeHint_ReconstructFrame) {
+  if (aHint & nsChangeHint::ReconstructFrame) {
     // If Servo fires reconstruct at a node, it is the only change hint fired at
     // that node.
 
@@ -55,7 +55,7 @@ void nsStyleChangeList::AppendChange(nsIFrame* aFrame, nsIContent* aContent,
 #ifdef DEBUG
     for (size_t i = 0; i < Length(); ++i) {
       MOZ_ASSERT(aContent != (*this)[i].mContent ||
-                     !((*this)[i].mHint & nsChangeHint_ReconstructFrame),
+                     !((*this)[i].mHint & nsChangeHint::ReconstructFrame),
                  "Should not append a non-ReconstructFrame hint after \
                  appending a ReconstructFrame hint for the same \
                  content.");

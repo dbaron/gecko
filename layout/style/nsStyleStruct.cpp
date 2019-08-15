@@ -221,13 +221,13 @@ nsChangeHint nsStyleFont::CalcDifference(const nsStyleFont& aNewData) const {
       break;
   }
 
-  // XXX Should any of these cause a non-nsChangeHint_NeutralChange change?
+  // XXX Should any of these cause a non-nsChangeHint::NeutralChange change?
   if (mGenericID != aNewData.mGenericID ||
       mScriptLevel != aNewData.mScriptLevel ||
       mScriptUnconstrainedSize != aNewData.mScriptUnconstrainedSize ||
       mScriptMinSize != aNewData.mScriptMinSize ||
       mScriptSizeMultiplier != aNewData.mScriptSizeMultiplier) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   return nsChangeHint(0);
@@ -271,13 +271,13 @@ nsChangeHint nsStyleMargin::CalcDifference(
   if (mMargin != aNewData.mMargin) {
     // Margin differences can't affect descendant intrinsic sizes and
     // don't need to force children to reflow.
-    hint |= nsChangeHint_NeedReflow | nsChangeHint_ReflowChangesSizeOrPosition |
-            nsChangeHint_ClearAncestorIntrinsics;
+    hint |= nsChangeHint::NeedReflow | nsChangeHint::ReflowChangesSizeOrPosition |
+            nsChangeHint::ClearAncestorIntrinsics;
   }
 
   if (mScrollMargin != aNewData.mScrollMargin) {
     // FIXME: Bug 1530253 Support re-snapping when scroll-margin changes.
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;
@@ -312,12 +312,12 @@ nsChangeHint nsStylePadding::CalcDifference(
     // force reflow of all descendants, but the hint would need to force
     // reflow of the frame's children (see how
     // ReflowInput::InitResizeFlags initializes the inline-resize flag).
-    hint |= NS_STYLE_HINT_REFLOW & ~nsChangeHint_ClearDescendantIntrinsics;
+    hint |= NS_STYLE_HINT_REFLOW & ~nsChangeHint::ClearDescendantIntrinsics;
   }
 
   if (mScrollPadding != aNewData.mScrollPadding) {
     // FIXME: Bug 1530253 Support re-snapping when scroll-padding changes.
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;
@@ -430,12 +430,12 @@ nsChangeHint nsStyleBorder::CalcDifference(
 
   NS_FOR_CSS_SIDES(ix) {
     // See the explanation in nsChangeHint.h of
-    // nsChangeHint_BorderStyleNoneChange .
+    // nsChangeHint::BorderStyleNoneChange .
     // Furthermore, even though we know *this* side is 0 width, just
     // assume a repaint hint for some other change rather than bother
     // tracking this result through the rest of the function.
     if (HasVisibleStyle(ix) != aNewData.HasVisibleStyle(ix)) {
-      return nsChangeHint_RepaintFrame | nsChangeHint_BorderStyleNoneChange;
+      return nsChangeHint::RepaintFrame | nsChangeHint::BorderStyleNoneChange;
     }
   }
 
@@ -447,12 +447,12 @@ nsChangeHint nsStyleBorder::CalcDifference(
   NS_FOR_CSS_SIDES(ix) {
     if (mBorderStyle[ix] != aNewData.mBorderStyle[ix] ||
         BorderColorFor(ix) != aNewData.BorderColorFor(ix)) {
-      return nsChangeHint_RepaintFrame;
+      return nsChangeHint::RepaintFrame;
     }
   }
 
   if (mBorderRadius != aNewData.mBorderRadius) {
-    return nsChangeHint_RepaintFrame;
+    return nsChangeHint::RepaintFrame;
   }
 
   // Loading status of the border image can be accessed in main thread only
@@ -465,7 +465,7 @@ nsChangeHint nsStyleBorder::CalcDifference(
         mBorderImageRepeatV != aNewData.mBorderImageRepeatV ||
         mBorderImageSlice != aNewData.mBorderImageSlice ||
         mBorderImageWidth != aNewData.mBorderImageWidth) {
-      return nsChangeHint_RepaintFrame;
+      return nsChangeHint::RepaintFrame;
     }
   }
 
@@ -473,7 +473,7 @@ nsChangeHint nsStyleBorder::CalcDifference(
   // need any change processing, since we operate on the computed
   // border values instead.
   if (mBorder != aNewData.mBorder) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   // mBorderImage* fields are checked only when border-image is not 'none'.
@@ -482,7 +482,7 @@ nsChangeHint nsStyleBorder::CalcDifference(
       mBorderImageRepeatV != aNewData.mBorderImageRepeatV ||
       mBorderImageSlice != aNewData.mBorderImageSlice ||
       mBorderImageWidth != aNewData.mBorderImageWidth) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   return nsChangeHint(0);
@@ -514,23 +514,23 @@ nsChangeHint nsStyleOutline::CalcDifference(
     const nsStyleOutline& aNewData) const {
   if (mActualOutlineWidth != aNewData.mActualOutlineWidth ||
       (mActualOutlineWidth > 0 && mOutlineOffset != aNewData.mOutlineOffset)) {
-    return nsChangeHint_UpdateOverflow | nsChangeHint_SchedulePaint |
-           nsChangeHint_RepaintFrame;
+    return nsChangeHint::UpdateOverflow | nsChangeHint::SchedulePaint |
+           nsChangeHint::RepaintFrame;
   }
 
   if (mOutlineStyle != aNewData.mOutlineStyle ||
       mOutlineColor != aNewData.mOutlineColor ||
       mOutlineRadius != aNewData.mOutlineRadius) {
     if (mActualOutlineWidth > 0) {
-      return nsChangeHint_RepaintFrame;
+      return nsChangeHint::RepaintFrame;
     }
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   if (mOutlineWidth != aNewData.mOutlineWidth ||
       mOutlineOffset != aNewData.mOutlineOffset ||
       mTwipsPerPixel != aNewData.mTwipsPerPixel) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   return nsChangeHint(0);
@@ -576,7 +576,7 @@ nsChangeHint nsStyleList::CalcDifference(
   // If the quotes implementation is ever going to change we might not need
   // a framechange here and a reflow should be sufficient.  See bug 35768.
   if (mQuotes != aNewData.mQuotes) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
   nsChangeHint hint = nsChangeHint(0);
   // Only elements whose display value is list-item can be affected by
@@ -587,14 +587,14 @@ nsChangeHint nsStyleList::CalcDifference(
   // to list-item, that change itself would cause ReconstructFrame.
   if (aOldDisplay.IsListItem()) {
     if (mListStylePosition != aNewData.mListStylePosition) {
-      return nsChangeHint_ReconstructFrame;
+      return nsChangeHint::ReconstructFrame;
     }
     if (mCounterStyle != aNewData.mCounterStyle) {
       return NS_STYLE_HINT_REFLOW;
     }
   } else if (mListStylePosition != aNewData.mListStylePosition ||
              mCounterStyle != aNewData.mCounterStyle) {
-    hint = nsChangeHint_NeutralChange;
+    hint = nsChangeHint::NeutralChange;
   }
   // This is an internal UA-sheet property that is true only for <ol reversed>
   // so hopefully it changes rarely.
@@ -661,7 +661,7 @@ nsChangeHint nsStyleXUL::CalcDifference(const nsStyleXUL& aNewData) const {
     return nsChangeHint(0);
   }
   if (mBoxOrdinal != aNewData.mBoxOrdinal) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
   return NS_STYLE_HINT_REFLOW;
 }
@@ -704,7 +704,7 @@ nsChangeHint nsStyleColumn::CalcDifference(
     // handle some edge cases where the column count gets smaller and content
     // overflows.
     // XXX not ideal
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if (mColumnWidth != aNewData.mColumnWidth ||
@@ -719,10 +719,10 @@ nsChangeHint nsStyleColumn::CalcDifference(
   }
 
   // XXX Is it right that we never check mTwipsPerPixel to return a
-  // non-nsChangeHint_NeutralChange hint?
+  // non-nsChangeHint::NeutralChange hint?
   if (mColumnRuleWidth != aNewData.mColumnRuleWidth ||
       mTwipsPerPixel != aNewData.mTwipsPerPixel) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   return nsChangeHint(0);
@@ -807,16 +807,16 @@ nsChangeHint nsStyleSVG::CalcDifference(const nsStyleSVG& aNewData) const {
       mMarkerStart != aNewData.mMarkerStart) {
     // Markers currently contribute to SVGGeometryFrame::mRect,
     // so we need a reflow as well as a repaint. No intrinsic sizes need
-    // to change, so nsChangeHint_NeedReflow is sufficient.
-    return nsChangeHint_UpdateEffects | nsChangeHint_NeedReflow |
-           nsChangeHint_NeedDirtyReflow |  // XXX remove me: bug 876085
-           nsChangeHint_RepaintFrame;
+    // to change, so nsChangeHint::NeedReflow is sufficient.
+    return nsChangeHint::UpdateEffects | nsChangeHint::NeedReflow |
+           nsChangeHint::NeedDirtyReflow |  // XXX remove me: bug 876085
+           nsChangeHint::RepaintFrame;
   }
 
   if (mFill != aNewData.mFill || mStroke != aNewData.mStroke ||
       mFillOpacity != aNewData.mFillOpacity ||
       mStrokeOpacity != aNewData.mStrokeOpacity) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
     if (HasStroke() != aNewData.HasStroke() ||
         (!HasStroke() && HasFill() != aNewData.HasFill())) {
       // Frame bounds and overflow rects depend on whether we "have" fill or
@@ -825,18 +825,18 @@ nsChangeHint nsStyleSVG::CalcDifference(const nsStyleSVG& aNewData) const {
       // frame bounds) and whether we have fill or not just changed. In either
       // case we need to reflow so the frame rect is updated.
       // XXXperf this is a waste on non SVGGeometryFrames.
-      hint |= nsChangeHint_NeedReflow |
-              nsChangeHint_NeedDirtyReflow;  // XXX remove me: bug 876085
+      hint |= nsChangeHint::NeedReflow |
+              nsChangeHint::NeedDirtyReflow;  // XXX remove me: bug 876085
     }
     if (PaintURIChanged(mFill, aNewData.mFill) ||
         PaintURIChanged(mStroke, aNewData.mStroke)) {
-      hint |= nsChangeHint_UpdateEffects;
+      hint |= nsChangeHint::UpdateEffects;
     }
   }
 
   // Stroke currently contributes to SVGGeometryFrame::mRect, so
   // we need a reflow here. No intrinsic sizes need to change, so
-  // nsChangeHint_NeedReflow is sufficient.
+  // nsChangeHint::NeedReflow is sufficient.
   // Note that stroke-dashoffset does not affect SVGGeometryFrame::mRect.
   // text-anchor and dominant-baseline changes also require a reflow since
   // they change frames' rects.
@@ -846,12 +846,12 @@ nsChangeHint nsStyleSVG::CalcDifference(const nsStyleSVG& aNewData) const {
       mStrokeLinejoin != aNewData.mStrokeLinejoin ||
       mDominantBaseline != aNewData.mDominantBaseline ||
       mTextAnchor != aNewData.mTextAnchor) {
-    return hint | nsChangeHint_NeedReflow |
-           nsChangeHint_NeedDirtyReflow |  // XXX remove me: bug 876085
-           nsChangeHint_RepaintFrame;
+    return hint | nsChangeHint::NeedReflow |
+           nsChangeHint::NeedDirtyReflow |  // XXX remove me: bug 876085
+           nsChangeHint::RepaintFrame;
   }
 
-  if (hint & nsChangeHint_RepaintFrame) {
+  if (hint & nsChangeHint::RepaintFrame) {
     return hint;  // we don't add anything else below
   }
 
@@ -864,12 +864,12 @@ nsChangeHint nsStyleSVG::CalcDifference(const nsStyleSVG& aNewData) const {
       mStrokeDasharray != aNewData.mStrokeDasharray ||
       mContextFlags != aNewData.mContextFlags ||
       mMozContextProperties.bits != aNewData.mMozContextProperties.bits) {
-    return hint | nsChangeHint_RepaintFrame;
+    return hint | nsChangeHint::RepaintFrame;
   }
 
   if (!hint) {
     if (mMozContextProperties.idents != aNewData.mMozContextProperties.idents) {
-      hint = nsChangeHint_NeutralChange;
+      hint = nsChangeHint::NeutralChange;
     }
   }
 
@@ -1109,11 +1109,11 @@ nsChangeHint nsStyleSVGReset::CalcDifference(
   if (mX != aNewData.mX || mY != aNewData.mY || mCx != aNewData.mCx ||
       mCy != aNewData.mCy || mR != aNewData.mR || mRx != aNewData.mRx ||
       mRy != aNewData.mRy) {
-    hint |= nsChangeHint_InvalidateRenderingObservers | nsChangeHint_NeedReflow;
+    hint |= nsChangeHint::InvalidateRenderingObservers | nsChangeHint::NeedReflow;
   }
 
   if (mClipPath != aNewData.mClipPath) {
-    hint |= nsChangeHint_UpdateEffects | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateEffects | nsChangeHint::RepaintFrame;
   }
 
   if (mVectorEffect != aNewData.mVectorEffect) {
@@ -1121,17 +1121,17 @@ nsChangeHint nsStyleSVGReset::CalcDifference(
     // vector-effect affect stroke. As a result we need to reflow if
     // vector-effect changes in order to have SVGGeometryFrame::
     // ReflowSVG called to update its mRect. No intrinsic sizes need
-    // to change so nsChangeHint_NeedReflow is sufficient.
-    hint |= nsChangeHint_NeedReflow |
-            nsChangeHint_NeedDirtyReflow |  // XXX remove me: bug 876085
-            nsChangeHint_RepaintFrame;
+    // to change so nsChangeHint::NeedReflow is sufficient.
+    hint |= nsChangeHint::NeedReflow |
+            nsChangeHint::NeedDirtyReflow |  // XXX remove me: bug 876085
+            nsChangeHint::RepaintFrame;
   } else if (mStopColor != aNewData.mStopColor ||
              mFloodColor != aNewData.mFloodColor ||
              mLightingColor != aNewData.mLightingColor ||
              mStopOpacity != aNewData.mStopOpacity ||
              mFloodOpacity != aNewData.mFloodOpacity ||
              mMaskType != aNewData.mMaskType) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   hint |=
@@ -1256,7 +1256,7 @@ nsChangeHint nsStylePosition::CalcDifference(
 
   // Changes to "z-index" require a repaint.
   if (mZIndex != aNewData.mZIndex) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   // Changes to "object-fit" & "object-position" require a repaint.  They
@@ -1264,7 +1264,7 @@ nsChangeHint nsStylePosition::CalcDifference(
   // can adjust the size & position of the subdocument.
   if (mObjectFit != aNewData.mObjectFit ||
       mObjectPosition != aNewData.mObjectPosition) {
-    hint |= nsChangeHint_RepaintFrame | nsChangeHint_NeedReflow;
+    hint |= nsChangeHint::RepaintFrame | nsChangeHint::NeedReflow;
   }
 
   if (mOrder != aNewData.mOrder) {
@@ -1274,7 +1274,7 @@ nsChangeHint nsStylePosition::CalcDifference(
     // since that's determined by styling on our parent) -- there, "order" can
     // affect which flex line we end up on, & hence can affect our sizing by
     // changing the group of flex items we're competing with for space.)
-    return hint | nsChangeHint_RepaintFrame | nsChangeHint_AllReflowHints;
+    return hint | nsChangeHint::RepaintFrame | nsChangeHint_AllReflowHints;
   }
 
   if (mBoxSizing != aNewData.mBoxSizing) {
@@ -1329,19 +1329,19 @@ nsChangeHint nsStylePosition::CalcDifference(
   if (mJustifyContent != aNewData.mJustifyContent ||
       mJustifyItems != aNewData.mJustifyItems ||
       mJustifySelf != aNewData.mJustifySelf) {
-    hint |= nsChangeHint_NeedReflow;
+    hint |= nsChangeHint::NeedReflow;
   }
 
   // No need to do anything if mSpecifiedJustifyItems changes, as long as
   // mJustifyItems (tested above) is unchanged.
   if (mSpecifiedJustifyItems != aNewData.mSpecifiedJustifyItems) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   // 'align-content' doesn't apply to a single-line flexbox but we don't know
   // if we're a flex container at this point so we can't optimize for that.
   if (mAlignContent != aNewData.mAlignContent) {
-    hint |= nsChangeHint_NeedReflow;
+    hint |= nsChangeHint::NeedReflow;
   }
 
   bool widthChanged = mWidth != aNewData.mWidth ||
@@ -1378,10 +1378,10 @@ nsChangeHint nsStylePosition::CalcDifference(
   if (mOffset != aNewData.mOffset) {
     if (IsAutonessEqual(mOffset, aNewData.mOffset)) {
       hint |=
-          nsChangeHint_RecomputePosition | nsChangeHint_UpdateParentOverflow;
+          nsChangeHint::RecomputePosition | nsChangeHint::UpdateParentOverflow;
     } else {
       hint |=
-          nsChangeHint_NeedReflow | nsChangeHint_ReflowChangesSizeOrPosition;
+          nsChangeHint::NeedReflow | nsChangeHint::ReflowChangesSizeOrPosition;
     }
   }
   return hint;
@@ -1429,7 +1429,7 @@ nsStyleTable::nsStyleTable(const nsStyleTable& aSource)
 
 nsChangeHint nsStyleTable::CalcDifference(const nsStyleTable& aNewData) const {
   if (mSpan != aNewData.mSpan || mLayoutStrategy != aNewData.mLayoutStrategy) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
   return nsChangeHint(0);
 }
@@ -1466,7 +1466,7 @@ nsChangeHint nsStyleTableBorder::CalcDifference(
   // conserve memory when using the separated border model (collapsed borders
   // require extra state to be stored).
   if (mBorderCollapse != aNewData.mBorderCollapse) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if ((mCaptionSide == aNewData.mCaptionSide) &&
@@ -2159,10 +2159,10 @@ nsChangeHint nsStyleImageLayers::CalcDifference(
 
   // If the number of visible images changes, then it's easy-peasy.
   if (mImageCount != aNewLayers.mImageCount) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
     if (aType == nsStyleImageLayers::LayerType::Mask ||
         AnyLayerIsElementImage(*this) || AnyLayerIsElementImage(aNewLayers)) {
-      hint |= nsChangeHint_UpdateEffects;
+      hint |= nsChangeHint::UpdateEffects;
     }
     return hint;
   }
@@ -2182,7 +2182,7 @@ nsChangeHint nsStyleImageLayers::CalcDifference(
       if (layerDifference && (IsElementImage(moreLayersLayer) ||
                               IsElementImage(lessLayersLayer))) {
         layerDifference |=
-            nsChangeHint_UpdateEffects | nsChangeHint_RepaintFrame;
+            nsChangeHint::UpdateEffects | nsChangeHint::RepaintFrame;
       }
       hint |= layerDifference;
       continue;
@@ -2194,7 +2194,7 @@ nsChangeHint nsStyleImageLayers::CalcDifference(
     if (i >= lessLayers.mLayers.Length()) {
       // The layer count differs, we know some property has changed, but if we
       // got here we know it won't affect rendering.
-      return nsChangeHint_NeutralChange;
+      return nsChangeHint::NeutralChange;
     }
 
     const Layer& lessLayersLayer = lessLayers.mLayers[i];
@@ -2203,7 +2203,7 @@ nsChangeHint nsStyleImageLayers::CalcDifference(
     if (moreLayersLayer.CalcDifference(lessLayersLayer)) {
       // We don't care about the difference returned, we know it's not visible,
       // but if something changed, then we need to return the neutral change.
-      return nsChangeHint_NeutralChange;
+      return nsChangeHint::NeutralChange;
     }
   }
 
@@ -2223,7 +2223,7 @@ nsChangeHint nsStyleImageLayers::CalcDifference(
       mPositionXCount != aNewLayers.mPositionXCount ||
       mPositionYCount != aNewLayers.mPositionYCount ||
       mSizeCount != aNewLayers.mSizeCount) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;
@@ -2517,17 +2517,17 @@ nsChangeHint nsStyleImageLayers::Layer::CalcDifference(
     const nsStyleImageLayers::Layer& aNewLayer) const {
   nsChangeHint hint = nsChangeHint(0);
   if (!UrlValuesEqual(mImage, aNewLayer.mImage)) {
-    hint |= nsChangeHint_RepaintFrame | nsChangeHint_UpdateEffects;
+    hint |= nsChangeHint::RepaintFrame | nsChangeHint::UpdateEffects;
   } else if (mAttachment != aNewLayer.mAttachment || mClip != aNewLayer.mClip ||
              mOrigin != aNewLayer.mOrigin || mRepeat != aNewLayer.mRepeat ||
              mBlendMode != aNewLayer.mBlendMode || mSize != aNewLayer.mSize ||
              mImage != aNewLayer.mImage || mMaskMode != aNewLayer.mMaskMode ||
              mComposite != aNewLayer.mComposite) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   if (mPosition != aNewLayer.mPosition) {
-    hint |= nsChangeHint_UpdateBackgroundPosition;
+    hint |= nsChangeHint::UpdateBackgroundPosition;
   }
 
   return hint;
@@ -2560,7 +2560,7 @@ nsChangeHint nsStyleBackground::CalcDifference(
     const nsStyleBackground& aNewData) const {
   nsChangeHint hint = nsChangeHint(0);
   if (mBackgroundColor != aNewData.mBackgroundColor) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   hint |= mImage.CalcDifference(aNewData.mImage,
@@ -2797,11 +2797,11 @@ static inline nsChangeHint CompareTransformValues(
   // Note: If we add a new change hint for transform changes here, we have to
   // modify KeyframeEffect::CalculateCumulativeChangeHint too!
   if (aOldTransform != aNewTransform) {
-    result |= nsChangeHint_UpdateTransformLayer;
+    result |= nsChangeHint::UpdateTransformLayer;
     if (!aOldTransform.IsNone() && !aNewTransform.IsNone()) {
-      result |= nsChangeHint_UpdatePostTransformOverflow;
+      result |= nsChangeHint::UpdatePostTransformOverflow;
     } else {
-      result |= nsChangeHint_UpdateOverflow;
+      result |= nsChangeHint::UpdateOverflow;
     }
   }
 
@@ -2818,7 +2818,7 @@ static inline nsChangeHint CompareMotionValues(
     }
 
     if (aDisplay.mOffsetPath.IsNone()) {
-      return nsChangeHint_NeutralChange;
+      return nsChangeHint::NeutralChange;
     }
   }
 
@@ -2826,11 +2826,11 @@ static inline nsChangeHint CompareMotionValues(
   // (or UpdateTransformLayer) if there's already a transform.
   // Set the same hints as what we use for transform because motion path is
   // a kind of transform and will be combined with other transforms.
-  nsChangeHint result = nsChangeHint_UpdateTransformLayer;
+  nsChangeHint result = nsChangeHint::UpdateTransformLayer;
   if (!aDisplay.mOffsetPath.IsNone() && !aNewDisplay.mOffsetPath.IsNone()) {
-    result |= nsChangeHint_UpdatePostTransformOverflow;
+    result |= nsChangeHint::UpdatePostTransformOverflow;
   } else {
-    result |= nsChangeHint_UpdateOverflow;
+    result |= nsChangeHint::UpdateOverflow;
   }
   return result;
 }
@@ -2845,7 +2845,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(
       mScrollBehavior != aNewData.mScrollBehavior ||
       mScrollSnapType != aNewData.mScrollSnapType ||
       mTopLayer != aNewData.mTopLayer || mResize != aNewData.mResize) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if ((mAppearance == StyleAppearance::Textfield &&
@@ -2858,22 +2858,22 @@ nsChangeHint nsStyleDisplay::CalcDifference(
     // values such as 'none'.) We need to reframe since we want to use
     // nsTextControlFrame instead of nsNumberControlFrame if the author
     // specifies 'textfield'.
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if (mScrollSnapAlign != aNewData.mScrollSnapAlign) {
     // FIXME: Bug 1530253 Support re-snapping when scroll-snap-align changes.
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   if (mOverflowX != aNewData.mOverflowX || mOverflowY != aNewData.mOverflowY) {
-    hint |= nsChangeHint_ScrollbarChange;
+    hint |= nsChangeHint::ScrollbarChange;
   }
 
   /* Note: When mScrollBehavior or mScrollSnapType are changed,
-   * nsChangeHint_NeutralChange is not sufficient to enter
+   * nsChangeHint::NeutralChange is not sufficient to enter
    * nsCSSFrameConstructor::PropagateScrollToViewport. By using the same hint as
-   * used when the overflow css property changes, nsChangeHint_ReconstructFrame,
+   * used when the overflow css property changes, nsChangeHint::ReconstructFrame,
    * PropagateScrollToViewport will be called.
    *
    * The scroll-behavior css property is not expected to change often (the
@@ -2899,7 +2899,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(
     } else {
       // shape-outside or shape-margin or shape-image-threshold changed,
       // but we don't need to reflow because we're not floating.
-      hint |= nsChangeHint_NeutralChange;
+      hint |= nsChangeHint::NeutralChange;
     }
   }
 
@@ -2925,11 +2925,11 @@ nsChangeHint nsStyleDisplay::CalcDifference(
       mAppearance != aNewData.mAppearance || mOrient != aNewData.mOrient ||
       mOverflowClipBoxBlock != aNewData.mOverflowClipBoxBlock ||
       mOverflowClipBoxInline != aNewData.mOverflowClipBoxInline) {
-    hint |= nsChangeHint_AllReflowHints | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint_AllReflowHints | nsChangeHint::RepaintFrame;
   }
 
   if (mIsolation != aNewData.mIsolation) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   /* If we've added or removed the transform property, we need to reconstruct
@@ -2947,7 +2947,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(
      *
      * If the property isn't present in either style struct, we still do the
      * comparisons but turn all the resulting change hints into
-     * nsChangeHint_NeutralChange.
+     * nsChangeHint::NeutralChange.
      */
     nsChangeHint transformHint = nsChangeHint(0);
 
@@ -2958,35 +2958,35 @@ nsChangeHint nsStyleDisplay::CalcDifference(
     transformHint |= CompareMotionValues(*this, aNewData);
 
     if (mTransformOrigin != aNewData.mTransformOrigin) {
-      transformHint |= nsChangeHint_UpdateTransformLayer |
-                       nsChangeHint_UpdatePostTransformOverflow;
+      transformHint |= nsChangeHint::UpdateTransformLayer |
+                       nsChangeHint::UpdatePostTransformOverflow;
     }
 
     if (mPerspectiveOrigin != aNewData.mPerspectiveOrigin ||
         mTransformStyle != aNewData.mTransformStyle ||
         mTransformBox != aNewData.mTransformBox) {
-      transformHint |= nsChangeHint_UpdateOverflow | nsChangeHint_RepaintFrame;
+      transformHint |= nsChangeHint::UpdateOverflow | nsChangeHint::RepaintFrame;
     }
 
     if (mBackfaceVisibility != aNewData.mBackfaceVisibility) {
-      transformHint |= nsChangeHint_RepaintFrame;
+      transformHint |= nsChangeHint::RepaintFrame;
     }
 
     if (transformHint) {
       if (HasTransformStyle()) {
         hint |= transformHint;
       } else {
-        hint |= nsChangeHint_NeutralChange;
+        hint |= nsChangeHint::NeutralChange;
       }
     }
   }
 
   if (HasPerspectiveStyle() != aNewData.HasPerspectiveStyle()) {
     // A change from/to being a containing block for position:fixed.
-    hint |= nsChangeHint_UpdateContainingBlock | nsChangeHint_UpdateOverflow |
-            nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateContainingBlock | nsChangeHint::UpdateOverflow |
+            nsChangeHint::RepaintFrame;
   } else if (mChildPerspective != aNewData.mChildPerspective) {
-    hint |= nsChangeHint_UpdateOverflow | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateOverflow | nsChangeHint::RepaintFrame;
   }
 
   // Note that the HasTransformStyle() != aNewData.HasTransformStyle()
@@ -3002,25 +3002,25 @@ nsChangeHint nsStyleDisplay::CalcDifference(
   if (willChangeBitsChanged &
       (StyleWillChangeBits_STACKING_CONTEXT | StyleWillChangeBits_SCROLL |
        StyleWillChangeBits_OPACITY)) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   if (willChangeBitsChanged &
       (StyleWillChangeBits_FIXPOS_CB | StyleWillChangeBits_ABSPOS_CB)) {
-    hint |= nsChangeHint_UpdateContainingBlock;
+    hint |= nsChangeHint::UpdateContainingBlock;
   }
 
   // If touch-action is changed, we need to regenerate the event regions on
   // the layers and send it over to the compositor for APZ to handle.
   if (mTouchAction != aNewData.mTouchAction) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   // If overscroll-behavior has changed, the changes are picked up
   // during a repaint.
   if (mOverscrollBehaviorX != aNewData.mOverscrollBehaviorX ||
       mOverscrollBehaviorY != aNewData.mOverscrollBehaviorY) {
-    hint |= nsChangeHint_SchedulePaint;
+    hint |= nsChangeHint::SchedulePaint;
   }
 
   if (mOriginalDisplay != aNewData.mOriginalDisplay) {
@@ -3032,9 +3032,9 @@ nsChangeHint nsStyleDisplay::CalcDifference(
     if (IsAbsolutelyPositionedStyle() &&
         aOldPosition.NeedsHypotheticalPositionIfAbsPos()) {
       hint |=
-          nsChangeHint_NeedReflow | nsChangeHint_ReflowChangesSizeOrPosition;
+          nsChangeHint::NeedReflow | nsChangeHint::ReflowChangesSizeOrPosition;
     } else {
-      hint |= nsChangeHint_NeutralChange;
+      hint |= nsChangeHint::NeutralChange;
     }
   }
 
@@ -3052,7 +3052,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(
   // notified about every new ComputedStyle constructed, and it uses
   // that opportunity to handle dynamic changes appropriately.
 
-  // But we still need to return nsChangeHint_NeutralChange for these
+  // But we still need to return nsChangeHint::NeutralChange for these
   // properties, since some data did change in the style struct.
 
   if (!hint && (mTransitions != aNewData.mTransitions ||
@@ -3074,7 +3074,7 @@ nsChangeHint nsStyleDisplay::CalcDifference(
                     aNewData.mAnimationIterationCountCount ||
                 mWillChange != aNewData.mWillChange ||
                 mOverflowAnchor != aNewData.mOverflowAnchor)) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;
@@ -3118,15 +3118,15 @@ nsChangeHint nsStyleVisibility::CalcDifference(
     // nsSubDocumentFrame::GetIntrinsicISize/BSize).
     // Also, the used writing-mode value is now a field on nsIFrame and some
     // classes (e.g. table rows/cells) copy their value from an ancestor.
-    hint |= nsChangeHint_ReconstructFrame;
+    hint |= nsChangeHint::ReconstructFrame;
   } else {
     if ((mImageOrientation != aNewData.mImageOrientation)) {
-      hint |= nsChangeHint_AllReflowHints | nsChangeHint_RepaintFrame;
+      hint |= nsChangeHint_AllReflowHints | nsChangeHint::RepaintFrame;
     }
     if (mVisible != aNewData.mVisible) {
       if (mVisible == NS_STYLE_VISIBILITY_VISIBLE ||
           aNewData.mVisible == NS_STYLE_VISIBILITY_VISIBLE) {
-        hint |= nsChangeHint_VisibilityChange;
+        hint |= nsChangeHint::VisibilityChange;
       }
       if ((NS_STYLE_VISIBILITY_COLLAPSE == mVisible) ||
           (NS_STYLE_VISIBILITY_COLLAPSE == aNewData.mVisible)) {
@@ -3139,11 +3139,11 @@ nsChangeHint nsStyleVisibility::CalcDifference(
       hint |= NS_STYLE_HINT_REFLOW;
     }
     if (mImageRendering != aNewData.mImageRendering) {
-      hint |= nsChangeHint_RepaintFrame;
+      hint |= nsChangeHint::RepaintFrame;
     }
     if (mColorAdjust != aNewData.mColorAdjust) {
       // color-adjust only affects media where dynamic changes can't happen.
-      hint |= nsChangeHint_NeutralChange;
+      hint |= nsChangeHint::NeutralChange;
     }
   }
   return hint;
@@ -3282,7 +3282,7 @@ nsChangeHint nsStyleContent::CalcDifference(
   // since we set all that up in the CSSFrameConstructor
   if (mContents != aNewData.mContents || mIncrements != aNewData.mIncrements ||
       mResets != aNewData.mResets || mSets != aNewData.mSets) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   return nsChangeHint(0);
@@ -3332,17 +3332,17 @@ nsChangeHint nsStyleTextReset::CalcDifference(
     // Changes to our text-decoration line can impact our overflow area &
     // also our descendants' overflow areas (particularly for text-frame
     // descendants).  So, we update those areas & trigger a repaint.
-    return nsChangeHint_RepaintFrame | nsChangeHint_UpdateSubtreeOverflow |
-           nsChangeHint_SchedulePaint;
+    return nsChangeHint::RepaintFrame | nsChangeHint::UpdateSubtreeOverflow |
+           nsChangeHint::SchedulePaint;
   }
 
   // Repaint for decoration color changes
   if (mTextDecorationColor != aNewData.mTextDecorationColor) {
-    return nsChangeHint_RepaintFrame;
+    return nsChangeHint::RepaintFrame;
   }
 
   if (mTextOverflow != aNewData.mTextOverflow) {
-    return nsChangeHint_RepaintFrame;
+    return nsChangeHint::RepaintFrame;
   }
 
   return nsChangeHint(0);
@@ -3433,12 +3433,12 @@ nsChangeHint nsStyleText::CalcDifference(const nsStyleText& aNewData) const {
   if (WhiteSpaceOrNewlineIsSignificant() !=
       aNewData.WhiteSpaceOrNewlineIsSignificant()) {
     // This may require construction of suppressed text frames
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if (mTextCombineUpright != aNewData.mTextCombineUpright ||
       mControlCharacterVisibility != aNewData.mControlCharacterVisibility) {
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if ((mTextAlign != aNewData.mTextAlign) ||
@@ -3466,7 +3466,7 @@ nsChangeHint nsStyleText::CalcDifference(const nsStyleText& aNewData) const {
       (HasEffectiveTextEmphasis() &&
        mTextEmphasisPosition != aNewData.mTextEmphasisPosition)) {
     // Text emphasis position change could affect line height calculation.
-    return nsChangeHint_AllReflowHints | nsChangeHint_RepaintFrame;
+    return nsChangeHint_AllReflowHints | nsChangeHint::RepaintFrame;
   }
 
   nsChangeHint hint = nsChangeHint(0);
@@ -3474,29 +3474,29 @@ nsChangeHint nsStyleText::CalcDifference(const nsStyleText& aNewData) const {
   // text-rendering changes require a reflow since they change SVG
   // frames' rects.
   if (mTextRendering != aNewData.mTextRendering) {
-    hint |= nsChangeHint_NeedReflow |
-            nsChangeHint_NeedDirtyReflow |  // XXX remove me: bug 876085
-            nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::NeedReflow |
+            nsChangeHint::NeedDirtyReflow |  // XXX remove me: bug 876085
+            nsChangeHint::RepaintFrame;
   }
 
   if (mTextShadow != aNewData.mTextShadow ||
       mTextEmphasisStyle != aNewData.mTextEmphasisStyle ||
       mWebkitTextStrokeWidth != aNewData.mWebkitTextStrokeWidth) {
-    hint |= nsChangeHint_UpdateSubtreeOverflow | nsChangeHint_SchedulePaint |
-            nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateSubtreeOverflow | nsChangeHint::SchedulePaint |
+            nsChangeHint::RepaintFrame;
 
     // We don't add any other hints below.
     return hint;
   }
 
   if (mColor != aNewData.mColor) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   if (mTextEmphasisColor != aNewData.mTextEmphasisColor ||
       mWebkitTextFillColor != aNewData.mWebkitTextFillColor ||
       mWebkitTextStrokeColor != aNewData.mWebkitTextStrokeColor) {
-    hint |= nsChangeHint_SchedulePaint | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::SchedulePaint | nsChangeHint::RepaintFrame;
   }
 
   if (hint) {
@@ -3504,7 +3504,7 @@ nsChangeHint nsStyleText::CalcDifference(const nsStyleText& aNewData) const {
   }
 
   if (mTextEmphasisPosition != aNewData.mTextEmphasisPosition) {
-    return nsChangeHint_NeutralChange;
+    return nsChangeHint::NeutralChange;
   }
 
   return nsChangeHint(0);
@@ -3610,21 +3610,21 @@ void nsStyleUI::TriggerImageLoads(Document& aDocument,
 nsChangeHint nsStyleUI::CalcDifference(const nsStyleUI& aNewData) const {
   nsChangeHint hint = nsChangeHint(0);
   if (mCursor != aNewData.mCursor) {
-    hint |= nsChangeHint_UpdateCursor;
+    hint |= nsChangeHint::UpdateCursor;
   }
 
   // We could do better. But it wouldn't be worth it, URL-specified cursors are
   // rare.
   if (mCursorImages != aNewData.mCursorImages) {
-    hint |= nsChangeHint_UpdateCursor;
+    hint |= nsChangeHint::UpdateCursor;
   }
 
   if (mPointerEvents != aNewData.mPointerEvents) {
     // SVGGeometryFrame's mRect depends on stroke _and_ on the value
     // of pointer-events. See SVGGeometryFrame::ReflowSVG's use of
     // GetHitTestFlags. (Only a reflow, no visual change.)
-    hint |= nsChangeHint_NeedReflow |
-            nsChangeHint_NeedDirtyReflow;  // XXX remove me: bug 876085
+    hint |= nsChangeHint::NeedReflow |
+            nsChangeHint::NeedDirtyReflow;  // XXX remove me: bug 876085
   }
 
   if (mUserModify != aNewData.mUserModify) {
@@ -3634,19 +3634,19 @@ nsChangeHint nsStyleUI::CalcDifference(const nsStyleUI& aNewData) const {
   if (mUserInput != aNewData.mUserInput) {
     if (StyleUserInput::None == mUserInput ||
         StyleUserInput::None == aNewData.mUserInput) {
-      hint |= nsChangeHint_ReconstructFrame;
+      hint |= nsChangeHint::ReconstructFrame;
     } else {
-      hint |= nsChangeHint_NeutralChange;
+      hint |= nsChangeHint::NeutralChange;
     }
   }
 
   if (mUserFocus != aNewData.mUserFocus) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   if (mCaretColor != aNewData.mCaretColor ||
       mScrollbarColor != aNewData.mScrollbarColor) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   return hint;
@@ -3690,16 +3690,16 @@ nsChangeHint nsStyleUIReset::CalcDifference(
   nsChangeHint hint = nsChangeHint(0);
 
   if (mForceBrokenImageIcon != aNewData.mForceBrokenImageIcon) {
-    hint |= nsChangeHint_ReconstructFrame;
+    hint |= nsChangeHint::ReconstructFrame;
   }
   if (mScrollbarWidth != aNewData.mScrollbarWidth) {
     // For scrollbar-width change, we need some special handling similar
     // to overflow properties. Specifically, we may need to reconstruct
     // the scrollbar or force reflow of the viewport scrollbar.
-    hint |= nsChangeHint_ScrollbarChange;
+    hint |= nsChangeHint::ScrollbarChange;
   }
   if (mWindowShadow != aNewData.mWindowShadow) {
-    // We really need just an nsChangeHint_SyncFrameView, except
+    // We really need just an nsChangeHint::SyncFrameView, except
     // on an ancestor of the frame, so we get that by doing a
     // reflow.
     hint |= NS_STYLE_HINT_REFLOW;
@@ -3709,16 +3709,16 @@ nsChangeHint nsStyleUIReset::CalcDifference(
   }
 
   if (mWindowDragging != aNewData.mWindowDragging) {
-    hint |= nsChangeHint_SchedulePaint;
+    hint |= nsChangeHint::SchedulePaint;
   }
 
   if (mWindowOpacity != aNewData.mWindowOpacity ||
       mMozWindowTransform != aNewData.mMozWindowTransform) {
-    hint |= nsChangeHint_UpdateWidgetProperties;
+    hint |= nsChangeHint::UpdateWidgetProperties;
   }
 
   if (!hint && mIMEMode != aNewData.mIMEMode) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;
@@ -3758,18 +3758,18 @@ nsChangeHint nsStyleEffects::CalcDifference(
     // Also request a repaint, since it's possible that only the color
     // of the shadow is changing (and UpdateOverflow/SchedulePaint won't
     // repaint for that, since they won't know what needs invalidating.)
-    hint |= nsChangeHint_UpdateOverflow | nsChangeHint_SchedulePaint |
-            nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateOverflow | nsChangeHint::SchedulePaint |
+            nsChangeHint::RepaintFrame;
   }
 
   if (mClipFlags != aNewData.mClipFlags) {
-    hint |= nsChangeHint_AllReflowHints | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint_AllReflowHints | nsChangeHint::RepaintFrame;
   }
 
   if (!mClip.IsEqualInterior(aNewData.mClip)) {
     // If the clip has changed, we just need to update overflow areas. DLBI
     // will handle the invalidation.
-    hint |= nsChangeHint_UpdateOverflow | nsChangeHint_SchedulePaint;
+    hint |= nsChangeHint::UpdateOverflow | nsChangeHint::SchedulePaint;
   }
 
   if (mOpacity != aNewData.mOpacity) {
@@ -3779,40 +3779,40 @@ nsChangeHint nsStyleEffects::CalcDifference(
     if ((mOpacity >= 0.99f && mOpacity < 1.0f && aNewData.mOpacity == 1.0f) ||
         (aNewData.mOpacity >= 0.99f && aNewData.mOpacity < 1.0f &&
          mOpacity == 1.0f)) {
-      hint |= nsChangeHint_RepaintFrame;
+      hint |= nsChangeHint::RepaintFrame;
     } else {
-      hint |= nsChangeHint_UpdateOpacityLayer;
+      hint |= nsChangeHint::UpdateOpacityLayer;
       if ((mOpacity == 1.0f) != (aNewData.mOpacity == 1.0f)) {
-        hint |= nsChangeHint_UpdateUsesOpacity;
+        hint |= nsChangeHint::UpdateUsesOpacity;
       }
     }
   }
 
   if (HasFilters() != aNewData.HasFilters()) {
     // A change from/to being a containing block for position:fixed.
-    hint |= nsChangeHint_UpdateContainingBlock;
+    hint |= nsChangeHint::UpdateContainingBlock;
   }
 
   if (mFilters != aNewData.mFilters) {
-    hint |= nsChangeHint_UpdateEffects | nsChangeHint_RepaintFrame |
-            nsChangeHint_UpdateOverflow;
+    hint |= nsChangeHint::UpdateEffects | nsChangeHint::RepaintFrame |
+            nsChangeHint::UpdateOverflow;
   }
 
   if (mMixBlendMode != aNewData.mMixBlendMode) {
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   }
 
   if (HasBackdropFilters() != aNewData.HasBackdropFilters()) {
     // A change from/to being a containing block for position:fixed.
-    hint |= nsChangeHint_UpdateContainingBlock;
+    hint |= nsChangeHint::UpdateContainingBlock;
   }
 
   if (mBackdropFilters != aNewData.mBackdropFilters) {
-    hint |= nsChangeHint_UpdateEffects | nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::UpdateEffects | nsChangeHint::RepaintFrame;
   }
 
   if (!hint && !mClip.IsEqualEdges(aNewData.mClip)) {
-    hint |= nsChangeHint_NeutralChange;
+    hint |= nsChangeHint::NeutralChange;
   }
 
   return hint;

@@ -458,7 +458,7 @@ void nsSVGImageFrame::ReflowSVG() {
   if (mState & NS_FRAME_FIRST_REFLOW) {
     // Make sure we have our filter property (if any) before calling
     // FinishAndStoreOverflow (subsequent filter changes are handled off
-    // nsChangeHint_UpdateEffects):
+    // nsChangeHint::UpdateEffects):
     SVGObserverUtils::UpdateEffects(this);
 
     if (!mReflowCallbackPosted) {
@@ -558,7 +558,7 @@ nsSVGImageListener::Notify(imgIRequest* aRequest, int32_t aType,
     mFrame->InvalidateFrame();
     nsLayoutUtils::PostRestyleEvent(mFrame->GetContent()->AsElement(),
                                     RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     nsSVGUtils::ScheduleReflowSVG(mFrame);
   }
 
@@ -567,7 +567,7 @@ nsSVGImageListener::Notify(imgIRequest* aRequest, int32_t aType,
     // nsSVGUtils::InvalidateAndScheduleBoundsUpdate.
     nsLayoutUtils::PostRestyleEvent(mFrame->GetContent()->AsElement(),
                                     RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     mFrame->InvalidateFrame();
   }
 
@@ -582,7 +582,7 @@ nsSVGImageListener::Notify(imgIRequest* aRequest, int32_t aType,
     mFrame->InvalidateFrame();
     nsLayoutUtils::PostRestyleEvent(mFrame->GetContent()->AsElement(),
                                     RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     nsSVGUtils::ScheduleReflowSVG(mFrame);
   }
 

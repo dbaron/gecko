@@ -169,7 +169,7 @@ nsresult nsSVGViewportFrame::AttributeChanged(int32_t aNameSpaceID,
     if (aAttribute == nsGkAtoms::width || aAttribute == nsGkAtoms::height) {
       nsLayoutUtils::PostRestyleEvent(
           mContent->AsElement(), RestyleHint{0},
-          nsChangeHint_InvalidateRenderingObservers);
+          nsChangeHint::InvalidateRenderingObservers);
       nsSVGUtils::ScheduleReflowSVG(this);
 
       if (content->HasViewBoxOrSyntheticViewBox()) {
@@ -200,13 +200,13 @@ nsresult nsSVGViewportFrame::AttributeChanged(int32_t aNameSpaceID,
 
       // We don't invalidate for transform changes (the layers code does that).
       // Also note that SVGTransformableElement::GetAttributeChangeHint will
-      // return nsChangeHint_UpdateOverflow for "transform" attribute changes
+      // return nsChangeHint::UpdateOverflow for "transform" attribute changes
       // and cause DoApplyRenderingChangeToTree to make the SchedulePaint call.
 
       if (aAttribute == nsGkAtoms::x || aAttribute == nsGkAtoms::y) {
         nsLayoutUtils::PostRestyleEvent(
             mContent->AsElement(), RestyleHint{0},
-            nsChangeHint_InvalidateRenderingObservers);
+            nsChangeHint::InvalidateRenderingObservers);
         nsSVGUtils::ScheduleReflowSVG(this);
       } else if (aAttribute == nsGkAtoms::viewBox ||
                  (aAttribute == nsGkAtoms::preserveAspectRatio &&

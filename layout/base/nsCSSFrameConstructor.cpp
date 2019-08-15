@@ -7841,7 +7841,7 @@ bool nsCSSFrameConstructor::EnsureFrameForTextNodeIsCreatedAfterFlush(
   }
 
   RestyleManager()->PostRestyleEvent(root, RestyleHint{0},
-                                     nsChangeHint_ReconstructFrame);
+                                     nsChangeHint::ReconstructFrame);
   return true;
 }
 
@@ -8741,7 +8741,7 @@ void nsCSSFrameConstructor::RecreateFramesForContent(
       // both elements and non-elements, but we need to make lazy frame
       // construction to apply to all elements first.
       RestyleManager()->PostRestyleEvent(aContent->AsElement(), RestyleHint{0},
-                                         nsChangeHint_ReconstructFrame);
+                                         nsChangeHint::ReconstructFrame);
     } else {
       // Now, recreate the frames associated with this content object. If
       // ContentRemoved triggered reconstruction, then we don't need to do this

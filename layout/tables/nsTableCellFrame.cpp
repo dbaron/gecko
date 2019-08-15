@@ -205,7 +205,7 @@ nsresult nsTableCellFrame::AttributeChanged(int32_t aNameSpaceID,
 
   if (aAttribute == nsGkAtoms::rowspan || aAttribute == nsGkAtoms::colspan) {
     nsLayoutUtils::PostRestyleEvent(mContent->AsElement(), RestyleHint{0},
-                                    nsChangeHint_UpdateTableCellSpans);
+                                    nsChangeHint::UpdateTableCellSpans);
   }
   return NS_OK;
 }

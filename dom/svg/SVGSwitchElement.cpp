@@ -56,7 +56,7 @@ void SVGSwitchElement::MaybeInvalidate() {
   nsIFrame* frame = GetPrimaryFrame();
   if (frame) {
     nsLayoutUtils::PostRestyleEvent(this, RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
     nsSVGUtils::ScheduleReflowSVG(frame);
   }
 

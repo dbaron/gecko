@@ -2337,7 +2337,7 @@ HTMLInputElement::EnablePreview() {
   mIsPreviewEnabled = true;
   // Reconstruct the frame to append an anonymous preview node
   nsLayoutUtils::PostRestyleEvent(this, RestyleHint{0},
-                                  nsChangeHint_ReconstructFrame);
+                                  nsChangeHint::ReconstructFrame);
 }
 
 NS_IMETHODIMP_(bool)
@@ -5296,18 +5296,18 @@ nsChangeHint HTMLInputElement::GetAttributeChangeHint(const nsAtom* aAttribute,
       // buttons we show for type=file.
       aAttribute == nsGkAtoms::allowdirs ||
       aAttribute == nsGkAtoms::webkitdirectory) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   } else if (mType == NS_FORM_INPUT_IMAGE &&
              (aAttribute == nsGkAtoms::alt || aAttribute == nsGkAtoms::value)) {
     // We might need to rebuild our alt text.  Just go ahead and
     // reconstruct our frame.  This should be quite rare..
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   } else if (aAttribute == nsGkAtoms::value) {
     retval |= NS_STYLE_HINT_REFLOW;
   } else if (aAttribute == nsGkAtoms::size && IsSingleLineTextControl(false)) {
     retval |= NS_STYLE_HINT_REFLOW;
   } else if (PlaceholderApplies() && aAttribute == nsGkAtoms::placeholder) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   }
   return retval;
 }
