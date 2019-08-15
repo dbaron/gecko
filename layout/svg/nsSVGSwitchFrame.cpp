@@ -233,7 +233,7 @@ void nsSVGSwitchFrame::ReflowSVG() {
   if (isFirstReflow) {
     // Make sure we have our filter property (if any) before calling
     // FinishAndStoreOverflow (subsequent filter changes are handled off
-    // nsChangeHint_UpdateEffects):
+    // nsChangeHint::UpdateEffects):
     SVGObserverUtils::UpdateEffects(this);
   }
 

@@ -378,7 +378,7 @@ void nsSVGRenderingObserverProperty::OnRenderingChange() {
     // coalesced).
     nsLayoutUtils::PostRestyleEvent(frame->GetContent()->AsElement(),
                                     RestyleHint{0},
-                                    nsChangeHint_InvalidateRenderingObservers);
+                                    nsChangeHint::InvalidateRenderingObservers);
   }
 }
 
@@ -436,7 +436,7 @@ void SVGTextPathObserver::OnRenderingChange() {
 
   // Repaint asynchronously in case the path frame is being torn down
   nsChangeHint changeHint =
-      nsChangeHint(nsChangeHint_RepaintFrame | nsChangeHint_UpdateTextPath);
+      nsChangeHint(nsChangeHint::RepaintFrame | nsChangeHint::UpdateTextPath);
   frame->PresContext()->RestyleManager()->PostRestyleEvent(
       frame->GetContent()->AsElement(), RestyleHint{0}, changeHint);
 }
@@ -464,13 +464,13 @@ void SVGMarkerObserver::OnRenderingChange() {
   // Don't need to request ReflowFrame if we're being reflowed.
   if (!(frame->GetStateBits() & NS_FRAME_IN_REFLOW)) {
     // XXXjwatt: We need to unify SVG into standard reflow so we can just use
-    // nsChangeHint_NeedReflow | nsChangeHint_NeedDirtyReflow here.
+    // nsChangeHint::NeedReflow | nsChangeHint::NeedDirtyReflow here.
     // XXXSDL KILL THIS!!!
     nsSVGUtils::ScheduleReflowSVG(frame);
   }
   frame->PresContext()->RestyleManager()->PostRestyleEvent(
       frame->GetContent()->AsElement(), RestyleHint{0},
-      nsChangeHint_RepaintFrame);
+      nsChangeHint::RepaintFrame);
 }
 
 class nsSVGPaintingProperty : public nsSVGRenderingObserverProperty {
@@ -767,19 +767,19 @@ void SVGFilterObserverListForCSSProp::OnRenderingChange() {
   }
 
   // Repaint asynchronously in case the filter frame is being torn down
-  nsChangeHint changeHint = nsChangeHint(nsChangeHint_RepaintFrame);
+  nsChangeHint changeHint = nsChangeHint(nsChangeHint::RepaintFrame);
 
   // Since we don't call nsSVGRenderingObserverProperty::
   // OnRenderingChange, we have to add this bit ourselves.
   if (frame->HasAllStateBits(NS_FRAME_SVG_LAYOUT)) {
     // Changes should propagate out to things that might be observing
     // the referencing frame or its ancestors.
-    changeHint |= nsChangeHint_InvalidateRenderingObservers;
+    changeHint |= nsChangeHint::InvalidateRenderingObservers;
   }
 
   // Don't need to request UpdateOverflow if we're being reflowed.
   if (!(frame->GetStateBits() & NS_FRAME_IN_REFLOW)) {
-    changeHint |= nsChangeHint_UpdateOverflow;
+    changeHint |= nsChangeHint::UpdateOverflow;
   }
   frame->PresContext()->RestyleManager()->PostRestyleEvent(
       frame->GetContent()->AsElement(), RestyleHint{0}, changeHint);

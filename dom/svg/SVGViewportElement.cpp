@@ -150,11 +150,11 @@ void SVGViewportElement::ChildrenOnlyTransformChanged(uint32_t aFlags) {
   if (hadChildrenOnlyTransform != mHasChildrenOnlyTransform) {
     // Reconstruct the frame tree to handle stacking context changes:
     // XXXjwatt don't do this for root-<svg> or even outer-<svg>?
-    changeHint = nsChangeHint_ReconstructFrame;
+    changeHint = nsChangeHint::ReconstructFrame;
   } else {
     // We just assume the old and new transforms are different.
-    changeHint = nsChangeHint(nsChangeHint_UpdateOverflow |
-                              nsChangeHint_ChildrenOnlyTransform);
+    changeHint = nsChangeHint(nsChangeHint::UpdateOverflow |
+                              nsChangeHint::ChildrenOnlyTransform);
   }
 
   // If we're not reconstructing the frame tree, then we only call
@@ -162,7 +162,7 @@ void SVGViewportElement::ChildrenOnlyTransformChanged(uint32_t aFlags) {
   // to death. See bug 767056 comments 10 and 12. Since our nsSVGOuterSVGFrame
   // is being reflowed we're going to invalidate and repaint its entire area
   // anyway (which will include our children).
-  if ((changeHint & nsChangeHint_ReconstructFrame) ||
+  if ((changeHint & nsChangeHint::ReconstructFrame) ||
       !(aFlags & eDuringReflow)) {
     nsLayoutUtils::PostRestyleEvent(this, RestyleHint{0}, changeHint);
   }

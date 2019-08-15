@@ -63,11 +63,11 @@ struct LayerAnimationInfo {
       DisplayItemType aDisplayItemType) {
     switch (aDisplayItemType) {
       case DisplayItemType::TYPE_BACKGROUND_COLOR:
-        return nsChangeHint_RepaintFrame;
+        return nsChangeHint::RepaintFrame;
       case DisplayItemType::TYPE_OPACITY:
-        return nsChangeHint_UpdateOpacityLayer;
+        return nsChangeHint::UpdateOpacityLayer;
       case DisplayItemType::TYPE_TRANSFORM:
-        return nsChangeHint_UpdateTransformLayer;
+        return nsChangeHint::UpdateTransformLayer;
       default:
         MOZ_ASSERT_UNREACHABLE(
             "Should not be called for display item types "

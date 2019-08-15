@@ -258,7 +258,7 @@ HTMLTextAreaElement::EnablePreview() {
   mIsPreviewEnabled = true;
   // Reconstruct the frame to append an anonymous preview node
   nsLayoutUtils::PostRestyleEvent(this, RestyleHint{0},
-                                  nsChangeHint_ReconstructFrame);
+                                  nsChangeHint::ReconstructFrame);
 }
 
 NS_IMETHODIMP_(bool)
@@ -404,9 +404,9 @@ nsChangeHint HTMLTextAreaElement::GetAttributeChangeHint(
   if (aAttribute == nsGkAtoms::rows || aAttribute == nsGkAtoms::cols) {
     retval |= NS_STYLE_HINT_REFLOW;
   } else if (aAttribute == nsGkAtoms::wrap) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   } else if (aAttribute == nsGkAtoms::placeholder) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   }
   return retval;
 }

@@ -23,7 +23,7 @@ class OverflowChangedTracker {
   enum ChangeKind {
     /**
      * The frame was explicitly added as a result of
-     * nsChangeHint_UpdatePostTransformOverflow and hence may have had a style
+     * nsChangeHint::UpdatePostTransformOverflow and hence may have had a style
      * change that changes its geometry relative to parent, without reflowing.
      */
     TRANSFORM_CHANGED,

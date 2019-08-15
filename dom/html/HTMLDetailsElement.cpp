@@ -33,7 +33,7 @@ nsChangeHint HTMLDetailsElement::GetAttributeChangeHint(
   nsChangeHint hint =
       nsGenericHTMLElement::GetAttributeChangeHint(aAttribute, aModType);
   if (aAttribute == nsGkAtoms::open) {
-    hint |= nsChangeHint_ReconstructFrame;
+    hint |= nsChangeHint::ReconstructFrame;
   }
   return hint;
 }

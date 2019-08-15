@@ -507,7 +507,7 @@ void ReflowInput::InitResizeFlags(nsPresContext* aPresContext,
   // data and the UsedPaddingProperty() have already been updated.  So,
   // instead, we explicitly check for the case where it's possible for
   // the content-box size to have changed without either (a) a change in
-  // the border-box size or (b) an nsChangeHint_NeedDirtyReflow change
+  // the border-box size or (b) an nsChangeHint::NeedDirtyReflow change
   // hint due to change in border or padding.  Thus we test using the
   // conditions from the previous paragraph, except without testing (1)
   // since it's complicated to test properly and less likely to help
@@ -610,7 +610,7 @@ void ReflowInput::InitResizeFlags(nsPresContext* aPresContext,
   // XXX Should we really need to null check mCBReflowInput?  (We do for
   // at least nsBoxFrame).
   if (mFrame->HasBSizeChange()) {
-    // When we have an nsChangeHint_UpdateComputedBSize, we'll set a bit
+    // When we have an nsChangeHint::UpdateComputedBSize, we'll set a bit
     // on the frame to indicate we're resizing.  This might catch cases,
     // such as a change between auto and a length, where the box doesn't
     // actually resize but children with percentages resize (since those
