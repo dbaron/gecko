@@ -1163,7 +1163,7 @@ nsChangeHint HTMLSelectElement::GetAttributeChangeHint(const nsAtom* aAttribute,
       nsGenericHTMLFormElementWithState::GetAttributeChangeHint(aAttribute,
                                                                 aModType);
   if (aAttribute == nsGkAtoms::multiple || aAttribute == nsGkAtoms::size) {
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   }
   return retval;
 }

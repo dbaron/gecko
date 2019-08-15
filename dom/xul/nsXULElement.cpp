@@ -1122,13 +1122,13 @@ nsChangeHint nsXULElement::GetAttributeChangeHint(const nsAtom* aAttribute,
     // value attribute is being added or removed, then we need to
     // return a hint of frame change.  (See bugzilla bug 95475 for
     // details.)
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   if (aAttribute == nsGkAtoms::type &&
       IsAnyOfXULElements(nsGkAtoms::toolbarbutton, nsGkAtoms::button)) {
     // type=menu switches from a button frame to a menu frame.
-    return nsChangeHint_ReconstructFrame;
+    return nsChangeHint::ReconstructFrame;
   }
 
   // if left or top changes we reflow. This will happen in xul

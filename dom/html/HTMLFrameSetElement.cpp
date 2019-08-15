@@ -47,7 +47,7 @@ nsresult HTMLFrameSetElement::BeforeSetAttr(int32_t aNamespaceID, nsAtom* aName,
         ParseRowCol(aValue->String(), mNumRows, &mRowSpecs);
 
         if (mNumRows != oldRows) {
-          mCurrentRowColHint = nsChangeHint_ReconstructFrame;
+          mCurrentRowColHint = nsChangeHint::ReconstructFrame;
         }
       }
     } else if (aName == nsGkAtoms::cols) {
@@ -56,7 +56,7 @@ nsresult HTMLFrameSetElement::BeforeSetAttr(int32_t aNamespaceID, nsAtom* aName,
         ParseRowCol(aValue->String(), mNumCols, &mColSpecs);
 
         if (mNumCols != oldCols) {
-          mCurrentRowColHint = nsChangeHint_ReconstructFrame;
+          mCurrentRowColHint = nsChangeHint::ReconstructFrame;
         }
       }
     }

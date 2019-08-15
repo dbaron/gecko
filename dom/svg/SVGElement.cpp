@@ -864,7 +864,7 @@ nsChangeHint SVGElement::GetAttributeChangeHint(const nsAtom* aAttribute,
     // It would be nice to only reconstruct the frame if the value returned by
     // SVGTests::PassesConditionalProcessingTests has changed, but we don't
     // know that
-    retval |= nsChangeHint_ReconstructFrame;
+    retval |= nsChangeHint::ReconstructFrame;
   }
   return retval;
 }
