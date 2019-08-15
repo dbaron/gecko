@@ -2938,7 +2938,7 @@ void PresShell::DestroyFramesForAndRestyle(Element* aElement) {
                                             RestyleManager::IncludeRoot::No);
 
   auto changeHint =
-      didReconstruct ? nsChangeHint(0) : nsChangeHint_ReconstructFrame;
+      didReconstruct ? nsChangeHint(0) : nsChangeHint::ReconstructFrame;
 
   mPresContext->RestyleManager()->PostRestyleEvent(
       aElement, RestyleHint::RestyleSubtree(), changeHint);
@@ -2954,7 +2954,7 @@ void PresShell::PostRecreateFramesFor(Element* aElement) {
   }
 
   mPresContext->RestyleManager()->PostRestyleEvent(
-      aElement, RestyleHint{0}, nsChangeHint_ReconstructFrame);
+      aElement, RestyleHint{0}, nsChangeHint::ReconstructFrame);
 }
 
 void PresShell::RestyleForAnimation(Element* aElement, RestyleHint aHint) {

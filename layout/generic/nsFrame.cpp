@@ -10690,7 +10690,7 @@ nsChangeHint nsIFrame::UpdateStyleOfOwnedChildFrame(
         childHint, aRestyleState.ChangesHandledFor(aChildFrame));
   }
   if (childHint) {
-    if (childHint & nsChangeHint_ReconstructFrame) {
+    if (childHint & nsChangeHint::ReconstructFrame) {
       // If we generate a reconstruct here, remove any non-reconstruct hints we
       // may have already generated for this content.
       aRestyleState.ChangeList().PopChangesForContent(

@@ -190,7 +190,7 @@ void nsSVGDisplayContainerFrame::RemoveFrame(ChildListID aListID,
   // need to schedule a repaint and schedule an update to our overflow rects.
   SchedulePaint();
   PresContext()->RestyleManager()->PostRestyleEvent(
-      mContent->AsElement(), RestyleHint{0}, nsChangeHint_UpdateOverflow);
+      mContent->AsElement(), RestyleHint{0}, nsChangeHint::UpdateOverflow);
 
   nsSVGContainerFrame::RemoveFrame(aListID, aOldFrame);
 }
@@ -352,7 +352,7 @@ void nsSVGDisplayContainerFrame::ReflowSVG() {
   if (isFirstReflow) {
     // Make sure we have our filter property (if any) before calling
     // FinishAndStoreOverflow (subsequent filter changes are handled off
-    // nsChangeHint_UpdateEffects):
+    // nsChangeHint::UpdateEffects):
     SVGObserverUtils::UpdateEffects(this);
   }
 

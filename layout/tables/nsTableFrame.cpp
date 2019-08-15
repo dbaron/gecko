@@ -4599,9 +4599,9 @@ bool nsTableFrame::BCRecalcNeeded(ComputedStyle* aOldComputedStyle,
   const nsStyleBorder* newStyleData = aNewComputedStyle->StyleBorder();
   nsChangeHint change = newStyleData->CalcDifference(*oldStyleData);
   if (!change) return false;
-  if (change & nsChangeHint_NeedReflow)
+  if (change & nsChangeHint::NeedReflow)
     return true;  // the caller only needs to mark the bc damage area
-  if (change & nsChangeHint_RepaintFrame) {
+  if (change & nsChangeHint::RepaintFrame) {
     // we need to recompute the borders and the caller needs to mark
     // the bc damage area
     // XXX In principle this should only be necessary for border style changes

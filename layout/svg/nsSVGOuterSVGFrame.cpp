@@ -112,7 +112,7 @@ void nsSVGOuterSVGFrame::Init(nsIContent* aContent, nsContainerFrame* aParent,
   // We don't create other SVG frames if PassesConditionalProcessingTests
   // returns false, but since we do create nsSVGOuterSVGFrame frames we
   // prevent them from painting by [ab]use NS_FRAME_IS_NONDISPLAY. The
-  // frame will be recreated via an nsChangeHint_ReconstructFrame restyle if
+  // frame will be recreated via an nsChangeHint::ReconstructFrame restyle if
   // the value returned by PassesConditionalProcessingTests changes.
   SVGSVGElement* svg = static_cast<SVGSVGElement*>(aContent);
   if (!svg->PassesConditionalProcessingTests()) {

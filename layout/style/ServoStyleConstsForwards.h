@@ -55,7 +55,7 @@ struct FontVariation;
 typedef mozilla::gfx::FontVariation gfxFontVariation;
 
 enum nsCSSUnit : uint32_t;
-enum nsChangeHint : uint32_t;
+enum class nsChangeHint : uint32_t;
 
 namespace nsStyleTransformMatrix {
 enum class MatrixTransformOperator : uint8_t;

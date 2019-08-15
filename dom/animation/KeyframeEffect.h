@@ -485,16 +485,16 @@ class KeyframeEffect : public AnimationEffect {
   // observers reflected by the transform.
   bool HasPropertiesThatMightAffectOverflow() const {
     return bool(mCumulativeChangeHint &
-                (nsChangeHint_AddOrRemoveTransform |
-                 nsChangeHint_UpdateOverflow |
-                 nsChangeHint_UpdatePostTransformOverflow |
-                 nsChangeHint_UpdateTransformLayer));
+                (nsChangeHint::AddOrRemoveTransform |
+                 nsChangeHint::UpdateOverflow |
+                 nsChangeHint::UpdatePostTransformOverflow |
+                 nsChangeHint::UpdateTransformLayer));
   }
 
   // Returns true if this effect causes visibility change.
   // (i.e. 'visibility: hidden' -> 'visibility: visible' and vice versa.)
   bool HasVisibilityChange() const {
-    return bool(mCumulativeChangeHint & nsChangeHint_VisibilityChange);
+    return bool(mCumulativeChangeHint & nsChangeHint::VisibilityChange);
   }
 };
 

@@ -140,7 +140,7 @@ nsChangeHint ComputedStyle::CalcStyleDifference(const ComputedStyle& aNewStyle,
   // Note that we do not check whether this->RelevantLinkVisited() !=
   // aNewContext->RelevantLinkVisited(); we don't need to since
   // nsCSSFrameConstructor::DoContentStateChanged always adds
-  // nsChangeHint_RepaintFrame for NS_EVENT_STATE_VISITED changes (and
+  // nsChangeHint::RepaintFrame for NS_EVENT_STATE_VISITED changes (and
   // needs to, since HasStateDependentStyle probably doesn't work right
   // for NS_EVENT_STATE_VISITED).  Hopefully this doesn't actually
   // expose whether links are visited to performance tests since all
@@ -150,7 +150,7 @@ nsChangeHint ComputedStyle::CalcStyleDifference(const ComputedStyle& aNewStyle,
   // happen depending on whether the link is visited or unvisited, since
   // doing only the one that's currently appropriate would expose which
   // links are in history to easy performance measurement.  Therefore,
-  // here, we add nsChangeHint_RepaintFrame hints (the maximum for
+  // here, we add nsChangeHint::RepaintFrame hints (the maximum for
   // things that can depend on :visited) for the properties on which we
   // call GetVisitedDependentColor.
   const ComputedStyle* thisVis = GetStyleIfVisited();
@@ -161,7 +161,7 @@ nsChangeHint ComputedStyle::CalcStyleDifference(const ComputedStyle& aNewStyle,
 #define STYLE_STRUCT(name_, fields_) *aEqualStructs &= ~STYLE_STRUCT_BIT(name_);
 #include "nsCSSVisitedDependentPropList.h"
 #undef STYLE_STRUCT
-    hint |= nsChangeHint_RepaintFrame;
+    hint |= nsChangeHint::RepaintFrame;
   } else if (thisVis) {
     // Both styles have a style-if-visited.
     bool change = false;
@@ -187,12 +187,12 @@ nsChangeHint ComputedStyle::CalcStyleDifference(const ComputedStyle& aNewStyle,
 #undef STYLE_STRUCT_BIT
 
     if (change) {
-      hint |= nsChangeHint_RepaintFrame;
+      hint |= nsChangeHint::RepaintFrame;
     }
   }
 
-  if (hint & nsChangeHint_UpdateContainingBlock) {
-    // If a struct returned nsChangeHint_UpdateContainingBlock, that
+  if (hint & nsChangeHint::UpdateContainingBlock) {
+    // If a struct returned nsChangeHint::UpdateContainingBlock, that
     // means that one property's influence on whether we're a containing
     // block for abs-pos or fixed-pos elements has changed.  However, we
     // only need to return the hint if the overall computation of
@@ -237,13 +237,13 @@ nsChangeHint ComputedStyle::CalcStyleDifference(const ComputedStyle& aNewStyle,
       // While some styles that cause the frame to be a containing block
       // has changed, the overall result cannot have changed (no matter
       // what the frame type is).
-      hint &= ~nsChangeHint_UpdateContainingBlock;
+      hint &= ~nsChangeHint::UpdateContainingBlock;
     }
   }
 
-  MOZ_ASSERT(NS_IsHintSubset(hint, nsChangeHint_AllHints),
-             "Added a new hint without bumping AllHints?");
-  return hint & ~nsChangeHint_NeutralChange;
+  MOZ_ASSERT(NS_IsHintSubset(hint, nsChangeHint::All_Hints),
+             "Added a new hint without bumping All_Hints?");
+  return hint & ~nsChangeHint::NeutralChange;
 }
 
 #ifdef DEBUG

@@ -47,7 +47,7 @@ nsresult nsSVGGFrame::AttributeChanged(int32_t aNameSpaceID, nsAtom* aAttribute,
   if (aNameSpaceID == kNameSpaceID_None && aAttribute == nsGkAtoms::transform) {
     // We don't invalidate for transform changes (the layers code does that).
     // Also note that SVGTransformableElement::GetAttributeChangeHint will
-    // return nsChangeHint_UpdateOverflow for "transform" attribute changes
+    // return nsChangeHint::UpdateOverflow for "transform" attribute changes
     // and cause DoApplyRenderingChangeToTree to make the SchedulePaint call.
     NotifySVGChanged(TRANSFORM_CHANGED);
   }

@@ -2713,7 +2713,7 @@ class nsIFrame : public nsQueryFrame {
 
   /**
    * Sets the view's attributes from the frame style.
-   * Call this for nsChangeHint_SyncFrameView style changes or when the view
+   * Call this for nsChangeHint::SyncFrameView style changes or when the view
    * has just been created.
    * @param aView the frame's view or use GetView() if nullptr is given
    */

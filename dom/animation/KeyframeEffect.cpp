@@ -1644,8 +1644,8 @@ void KeyframeEffect::CalculateCumulativeChangeHint(
         // generate.
         mCumulativeChangeHint |=
             nsChangeHint_ComprehensiveAddOrRemoveTransform |
-            nsChangeHint_UpdatePostTransformOverflow |
-            nsChangeHint_UpdateTransformLayer;
+            nsChangeHint::UpdatePostTransformOverflow |
+            nsChangeHint::UpdateTransformLayer;
         continue;
       }
 

@@ -86,14 +86,14 @@ nsresult nsSVGForeignObjectFrame::AttributeChanged(int32_t aNameSpaceID,
     if (aAttribute == nsGkAtoms::transform) {
       // We don't invalidate for transform changes (the layers code does that).
       // Also note that SVGTransformableElement::GetAttributeChangeHint will
-      // return nsChangeHint_UpdateOverflow for "transform" attribute changes
+      // return nsChangeHint::UpdateOverflow for "transform" attribute changes
       // and cause DoApplyRenderingChangeToTree to make the SchedulePaint call.
       mCanvasTM = nullptr;
     } else if (aAttribute == nsGkAtoms::viewBox ||
                aAttribute == nsGkAtoms::preserveAspectRatio) {
       nsLayoutUtils::PostRestyleEvent(
           mContent->AsElement(), RestyleHint{0},
-          nsChangeHint_InvalidateRenderingObservers);
+          nsChangeHint::InvalidateRenderingObservers);
     }
   }
 
@@ -347,7 +347,7 @@ void nsSVGForeignObjectFrame::ReflowSVG() {
   if (mState & NS_FRAME_FIRST_REFLOW) {
     // Make sure we have our filter property (if any) before calling
     // FinishAndStoreOverflow (subsequent filter changes are handled off
-    // nsChangeHint_UpdateEffects):
+    // nsChangeHint::UpdateEffects):
     SVGObserverUtils::UpdateEffects(this);
   }
 

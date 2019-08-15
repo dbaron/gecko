@@ -1569,7 +1569,7 @@ impl<'le> TElement for GeckoElement<'le> {
             unsafe {
                 self.note_explicit_hints(
                     RestyleHint::restyle_subtree(),
-                    nsChangeHint::nsChangeHint_Empty,
+                    nsChangeHint::nsChangeHint::Empty,
                 );
             }
         }

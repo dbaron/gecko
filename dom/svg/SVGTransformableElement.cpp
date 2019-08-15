@@ -53,7 +53,7 @@ nsChangeHint SVGTransformableElement::GetAttributeChangeHint(
       aAttribute == nsGkAtoms::mozAnimateMotionDummyAttr) {
     nsIFrame* frame =
         const_cast<SVGTransformableElement*>(this)->GetPrimaryFrame();
-    retval |= nsChangeHint_InvalidateRenderingObservers;
+    retval |= nsChangeHint::InvalidateRenderingObservers;
     if (!frame || (frame->GetStateBits() & NS_FRAME_IS_NONDISPLAY)) {
       return retval;
     }
@@ -76,11 +76,11 @@ nsChangeHint SVGTransformableElement::GetAttributeChangeHint(
 
     if (isAdditionOrRemoval) {
       // Reconstruct the frame tree to handle stacking context changes:
-      retval |= nsChangeHint_ReconstructFrame;
+      retval |= nsChangeHint::ReconstructFrame;
     } else {
       // We just assume the old and new transforms are different.
-      retval |= nsChangeHint_UpdatePostTransformOverflow |
-                nsChangeHint_UpdateTransformLayer;
+      retval |= nsChangeHint::UpdatePostTransformOverflow |
+                nsChangeHint::UpdateTransformLayer;
     }
   }
   return retval;
@@ -132,7 +132,7 @@ void SVGTransformableElement::SetAnimateMotionTransform(
   if (frame) {
     // If the result of this transform and any other transforms on this frame
     // is the identity matrix, then DoApplyRenderingChangeToTree won't handle
-    // our nsChangeHint_UpdateTransformLayer hint since aFrame->IsTransformed()
+    // our nsChangeHint::UpdateTransformLayer hint since aFrame->IsTransformed()
     // will return false. That's fine, but we still need to schedule a repaint,
     // and that won't otherwise happen. Since it's cheap to call SchedulePaint,
     // we don't bother to check IsTransformed().
