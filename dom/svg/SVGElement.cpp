@@ -2057,7 +2057,7 @@ void SVGElement::DidAnimateTransformList(int32_t aModType) {
     // nsNodeUtils::AttributeChanged dispatches would be inappropriate
     // anyway), so we need to post the change event ourself.
     nsChangeHint changeHint = GetAttributeChangeHint(transformAttr, aModType);
-    if (changeHint) {
+    if (bool(changeHint)) {
       nsLayoutUtils::PostRestyleEvent(this, RestyleHint{0}, changeHint);
     }
   }
