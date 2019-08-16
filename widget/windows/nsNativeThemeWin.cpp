@@ -2365,11 +2365,11 @@ nsNativeThemeWin::GetMinimumWidgetSize(nsPresContext* aPresContext,
       if (aAppearance == StyleAppearance::ScalethumbHorizontal ||
           (aAppearance == StyleAppearance::RangeThumb &&
            IsRangeHorizontal(aFrame))) {
-        aResult->width = 12;
-        aResult->height = 20;
+        aResult->width = aPresContext->CSSPixelsToDevPixels(12);
+        aResult->height = aPresContext->CSSPixelsToDevPixels(20);
       } else {
-        aResult->width = 20;
-        aResult->height = 12;
+        aResult->width = aPresContext->CSSPixelsToDevPixels(20);
+        aResult->height = aPresContext->CSSPixelsToDevPixels(12);
       }
       ScaleForFrameDPI(aResult, aFrame);
       return rv;
@@ -2390,7 +2390,7 @@ nsNativeThemeWin::GetMinimumWidgetSize(nsPresContext* aPresContext,
     case StyleAppearance::Separator:
       // that's 2px left margin, 2px right margin and 2px separator
       // (the margin is drawn as part of the separator, though)
-      aResult->width = 6;
+      aResult->width = aPresContext->CSSPixelsToDevPixels(6);
       ScaleForFrameDPI(aResult, aFrame);
       return rv;
 
@@ -2924,10 +2924,12 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
 
   (*aResult).width = (*aResult).height = 0;
   *aIsOverridable = true;
+  nsPresContext* presContext = aFrame->PresContext();
   switch (aAppearance) {
     case StyleAppearance::Radio:
     case StyleAppearance::Checkbox:
-      (*aResult).width = (*aResult).height = 13;
+      (*aResult).width = (*aResult).height =
+          presContext->CSSPixelsToDevPixels(13);
       break;
     case StyleAppearance::Menucheckbox:
     case StyleAppearance::Menuradio:
@@ -2939,7 +2941,8 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
     case StyleAppearance::SpinnerUpbutton:
     case StyleAppearance::SpinnerDownbutton:
       (*aResult).width = ::GetSystemMetrics(SM_CXVSCROLL);
-      (*aResult).height = 8;  // No good metrics available for this
+      // No good metrics available for this
+      (*aResult).height = presContext->CSSPixelsToDevPixels(8);
       *aIsOverridable = false;
       break;
     case StyleAppearance::ScrollbarbuttonUp:
@@ -2974,23 +2977,23 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
     }
     case StyleAppearance::RangeThumb: {
       if (IsRangeHorizontal(aFrame)) {
-        (*aResult).width = 12;
-        (*aResult).height = 20;
+        (*aResult).width = presContext->CSSPixelsToDevPixels(12);
+        (*aResult).height = presContext->CSSPixelsToDevPixels(20);
       } else {
-        (*aResult).width = 20;
-        (*aResult).height = 12;
+        (*aResult).width = presContext->CSSPixelsToDevPixels(20);
+        (*aResult).height = presContext->CSSPixelsToDevPixels(12);
       }
       *aIsOverridable = false;
       break;
     }
     case StyleAppearance::ScalethumbHorizontal:
-      (*aResult).width = 12;
-      (*aResult).height = 20;
+      (*aResult).width = presContext->CSSPixelsToDevPixels(12);
+      (*aResult).height = presContext->CSSPixelsToDevPixels(20);
       *aIsOverridable = false;
       break;
     case StyleAppearance::ScalethumbVertical:
-      (*aResult).width = 20;
-      (*aResult).height = 12;
+      (*aResult).width = presContext->CSSPixelsToDevPixels(20);
+      (*aResult).height = presContext->CSSPixelsToDevPixels(12);
       *aIsOverridable = false;
       break;
     case StyleAppearance::MenulistButton:
@@ -3023,9 +3026,11 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       nc.cbSize = sizeof(nc);
       if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(nc), &nc, 0))
         (*aResult).width = (*aResult).height =
-            abs(nc.lfStatusFont.lfHeight) + 4;
+            abs(nc.lfStatusFont.lfHeight) +
+            presContext->CSSPixelsToDevPixels(4);
       else
-        (*aResult).width = (*aResult).height = 15;
+        (*aResult).width = (*aResult).height =
+            presContext->CSSPixelsToDevPixels(15);
       *aIsOverridable = false;
       break;
     }
@@ -3064,7 +3069,7 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       break;
     case StyleAppearance::Menuseparator: {
       aResult->width = 0;
-      aResult->height = 10;
+      aResult->height = presContext->CSSPixelsToDevPixels(10);
       break;
     }
 
@@ -3093,6 +3098,7 @@ nsresult nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       aResult->height = GetSystemMetrics(SM_CYSIZE);
       // XXX I have no idea why these caption metrics are always off,
       // but they are.
+      // FIXME: Are they off in CSS pixels or device pixels?
       aResult->width -= 2;
       aResult->height -= 4;
       if (aAppearance == StyleAppearance::MozWindowButtonMinimize) {

@@ -1674,19 +1674,19 @@ nsNativeThemeGTK::GetMinimumWidgetSize(nsPresContext* aPresContext,
     case StyleAppearance::InnerSpinButton:
     case StyleAppearance::Spinner:
       // hard code these sizes
-      aResult->width = 14;
-      aResult->height = 26;
+      aResult->width = aPresContext->CSSPixelsToDevPixels(14);
+      aResult->height = aPresContext->CSSPixelsToDevPixels(26);
       break;
     case StyleAppearance::Treeheadersortarrow:
     case StyleAppearance::SpinnerUpbutton:
     case StyleAppearance::SpinnerDownbutton:
       // hard code these sizes
-      aResult->width = 14;
-      aResult->height = 13;
+      aResult->width = aPresContext->CSSPixelsToDevPixels(14);
+      aResult->height = aPresContext->CSSPixelsToDevPixels(13);
       break;
     case StyleAppearance::Resizer:
       // same as Windows to make our lives easier
-      aResult->width = aResult->height = 15;
+      aResult->width = aResult->height = aPresContext->CSSPixelsToDevPixels(15);
       *aIsOverridable = false;
       break;
     case StyleAppearance::Treetwisty:

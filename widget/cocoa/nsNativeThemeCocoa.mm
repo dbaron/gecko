@@ -3905,7 +3905,8 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
       // at minimum, we should be tall enough for 9pt text.
       // I'm using hardcoded values here because the appearance manager
       // values for the frame size are incorrect.
-      aResult->SizeTo(0, (2 + 2) /* top */ + 9 + (1 + 1) /* bottom */);
+      aResult->SizeTo(
+          0, aPresContext->CSSPixelsToDevPixels((2 + 2) /* top */ + 9 + (1 + 1) /* bottom */));
       break;
     }
 
@@ -3921,7 +3922,8 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
           !nsCocoaFeatures::OnYosemiteOrLater()) {
         // This value is hardcoded because it's needed before we can measure the
         // position and size of the fullscreen button.
-        aResult->SizeTo(16, 17);
+        aResult->SizeTo(aPresContext->CSSPixelsToDevPixels(16),
+                        aPresContext->CSSPixelsToDevPixels(17));
       }
       *aIsOverridable = false;
       break;
@@ -3935,7 +3937,8 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
     }
 
     case StyleAppearance::Separator: {
-      aResult->SizeTo(1, 1);
+      int32_t oneCSSPixel = aPresContext->CSSPixelsToDevPixels(1);
+      aResult->SizeTo(oneCSSPixel, oneCSSPixel);
       break;
     }
 
@@ -3953,6 +3956,7 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
     case StyleAppearance::Treeheadercell: {
       SInt32 headerHeight = 0;
       ::GetThemeMetric(kThemeMetricListHeaderHeight, &headerHeight);
+      // FIXME: device pixels or CSS pixels?
       aResult->SizeTo(0, headerHeight - 1);  // We don't need the top border.
       break;
     }
@@ -4005,9 +4009,11 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
 
       if (nsLookAndFeel::UseOverlayScrollbars()) {
         if (IsSmallScrollbar(aFrame)) {
-          aResult->SizeTo(14, 14);
+          int32_t size = aPresContext->CSSPixelsToDevPixels(14);
+          aResult->SizeTo(size, size);
         } else {
-          aResult->SizeTo(16, 16);
+          int32_t size = aPresContext->CSSPixelsToDevPixels(16);
+          aResult->SizeTo(size, size);
         }
         break;
       }
@@ -4054,6 +4060,7 @@ nsNativeThemeCocoa::GetMinimumWidgetSize(nsPresContext* aPresContext, nsIFrame* 
       ::GetThemeMetric(themeMetric, &scrollbarWidth);
 
       // It seems that for both sizes of scrollbar, the buttons are one pixel "longer".
+      // FIXME: device pixels or CSS pixels?
       if (aAppearance == StyleAppearance::ScrollbarbuttonLeft ||
           aAppearance == StyleAppearance::ScrollbarbuttonRight)
         aResult->SizeTo(scrollbarWidth + 1, scrollbarWidth);
