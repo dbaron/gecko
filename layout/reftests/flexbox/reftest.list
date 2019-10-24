@@ -128,3 +128,7 @@ fuzzy-if(gtkWidget,0-1,0-31) == flexbox-widget-flex-items-4.html flexbox-widget-
 == flexbox-min-bsize-keywords-vert-1.html flexbox-min-bsize-keywords-vert-1-ref.html
 == flexbox-min-bsize-keywords-horiz-1.html flexbox-min-bsize-keywords-horiz-1-ref.html
 == flexbox-bsize-keywords-no-stretch-1.html flexbox-bsize-keywords-no-stretch-1-ref.html
+
+# Test for bug 1584018, relating to block-resizes affecting the percentage
+# basis of children.
+fails == flexbox-dyn-child-percent-resize-1.html flexbox-dyn-child-percent-resize-1-ref.html
