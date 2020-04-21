@@ -3379,7 +3379,7 @@ class nsIFrame : public nsQueryFrame {
   Sides GetSkipSides(const ReflowInput* aReflowInput = nullptr) const;
   virtual LogicalSides GetLogicalSkipSides(
       const ReflowInput* aReflowInput = nullptr) const {
-    return LogicalSides();
+    return LogicalSides(mWritingMode);
   }
 
   /**
